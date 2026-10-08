@@ -1,0 +1,7 @@
+{
+  "status": "COMPLETED",
+  "manifest": "165601506c3406b237b4d204377f62e1c463b3a75da4491f0d620f63dc60cf84",
+  "candidates": 418,
+  "p15_net": -6556.6965732246545,
+  "p20_net": -8839.90218035577
+}
