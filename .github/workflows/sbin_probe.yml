@@ -1,1 +1,167 @@
+name: KATS ODPC V0 - SBIN data probe
 
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "probe/SBIN_probe.json"
+      - "probe/SBIN_probe.md"
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out scratch repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install probe dependencies
+        run: python -m pip install --disable-pip-version-check pandas pyarrow
+
+      - name: Download only SBIN.parquet
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --filter=blob:none --sparse \
+            https://github.com/rahulkanadia/IndianMarkets_DataBackfill.git source_data
+          git -C source_data sparse-checkout set SBIN.parquet
+          test -s source_data/SBIN.parquet
+          git -C source_data rev-parse HEAD > source_commit.txt
+
+      - name: Inspect SBIN data without strategy evaluation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p probe
+          python - <<'PY'
+          from __future__ import annotations
+
+          import hashlib
+          import json
+          from pathlib import Path
+
+          import pandas as pd
+          import pyarrow.parquet as pq
+
+          path = Path("source_data/SBIN.parquet")
+          digest = hashlib.sha256()
+          with path.open("rb") as handle:
+              for block in iter(lambda: handle.read(1024 * 1024), b""):
+                  digest.update(block)
+
+          parquet = pq.ParquetFile(path)
+          schema = parquet.schema_arrow
+          names = list(schema.names)
+          lower_to_actual = {name.lower(): name for name in names}
+
+          timestamp_candidates = (
+              "datetime", "timestamp", "date_time", "time", "date"
+          )
+          timestamp_column = next(
+              (lower_to_actual[name] for name in timestamp_candidates
+               if name in lower_to_actual),
+              None,
+          )
+
+          required = {}
+          for canonical in ("open", "high", "low", "close", "volume"):
+              required[canonical] = lower_to_actual.get(canonical)
+          ohlcv_present = all(required.values())
+
+          sample = pd.read_parquet(path).head(5)
+          if timestamp_column is not None:
+              timestamps = pd.read_parquet(path, columns=[timestamp_column])[timestamp_column]
+              parsed = pd.to_datetime(timestamps, errors="coerce")
+              valid = parsed.dropna()
+              earliest = None if valid.empty else valid.min().isoformat()
+              latest = None if valid.empty else valid.max().isoformat()
+              timezone = str(getattr(parsed.dt, "tz", None))
+              null_or_unparseable_timestamps = int(parsed.isna().sum())
+          else:
+              earliest = latest = timezone = None
+              null_or_unparseable_timestamps = None
+
+          report = {
+              "probe_kind": "PRE_OUTCOME_INFRASTRUCTURE_CHECK",
+              "strategy_outcomes_computed": False,
+              "source_repository": "rahulkanadia/IndianMarkets_DataBackfill",
+              "source_commit": Path("source_commit.txt").read_text().strip(),
+              "file": "SBIN.parquet",
+              "bytes": path.stat().st_size,
+              "sha256": digest.hexdigest(),
+              "schema": str(schema),
+              "columns": names,
+              "row_count": parquet.metadata.num_rows,
+              "row_groups": parquet.metadata.num_row_groups,
+              "timestamp_column": timestamp_column,
+              "timezone": timezone,
+              "earliest_timestamp": earliest,
+              "latest_timestamp": latest,
+              "null_or_unparseable_timestamps": null_or_unparseable_timestamps,
+              "ohlcv_mapping": required,
+              "ohlcv_present": ohlcv_present,
+              "sample_rows": json.loads(sample.to_json(orient="records", date_format="iso")),
+          }
+
+          Path("probe/SBIN_probe.json").write_text(
+              json.dumps(report, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          md = [
+              "# KATS-ODPC-V0 SBIN Data Probe",
+              "",
+              "This is a pre-outcome infrastructure check. No strategy outcome was computed.",
+              "",
+              f"- Bytes: `{report['bytes']}`",
+              f"- SHA256: `{report['sha256']}`",
+              f"- Rows: `{report['row_count']}`",
+              f"- Timestamp column: `{timestamp_column}`",
+              f"- Timezone: `{timezone}`",
+              f"- Earliest: `{earliest}`",
+              f"- Latest: `{latest}`",
+              f"- OHLCV present: `{ohlcv_present}`",
+              "",
+              "## Schema",
+              "",
+              "```text",
+              str(schema),
+              "```",
+              "",
+              "Full machine-readable results, including sample rows, are in `SBIN_probe.json`.",
+          ]
+          Path("probe/SBIN_probe.md").write_text("\n".join(md) + "\n", encoding="utf-8")
+          print(json.dumps(report, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload immutable probe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kats-odpc-v0-sbin-probe
+          path: |
+            probe/SBIN_probe.json
+            probe/SBIN_probe.md
+          if-no-files-found: error
+
+      - name: Commit probe report to scratch repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add probe/SBIN_probe.json probe/SBIN_probe.md
+          if git diff --cached --quiet; then
+            echo "Probe report is unchanged."
+          else
+            git commit -m "Add frozen SBIN pre-outcome data probe"
+            git push
+          fi
