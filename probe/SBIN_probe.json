@@ -1,0 +1,81 @@
+{
+  "bytes": 14426424,
+  "columns": [
+    "Date",
+    "Open",
+    "High",
+    "Low",
+    "Close",
+    "Volume",
+    "index"
+  ],
+  "earliest_timestamp": "2018-01-01T09:15:00",
+  "file": "SBIN.parquet",
+  "latest_timestamp": "2025-12-31T15:29:00",
+  "null_or_unparseable_timestamps": 0,
+  "ohlcv_mapping": {
+    "close": "Close",
+    "high": "High",
+    "low": "Low",
+    "open": "Open",
+    "volume": "Volume"
+  },
+  "ohlcv_present": true,
+  "probe_kind": "PRE_OUTCOME_INFRASTRUCTURE_CHECK",
+  "row_count": 749980,
+  "row_groups": 1,
+  "sample_rows": [
+    {
+      "Close": 311.2,
+      "Date": "2018-01-01T09:15:00.000",
+      "High": 311.3,
+      "Low": 310.2,
+      "Open": 310.6,
+      "Volume": 97992,
+      "index": null
+    },
+    {
+      "Close": 311.2,
+      "Date": "2018-01-01T09:16:00.000",
+      "High": 311.6,
+      "Low": 311.2,
+      "Open": 311.3,
+      "Volume": 54317,
+      "index": null
+    },
+    {
+      "Close": 311.05,
+      "Date": "2018-01-01T09:17:00.000",
+      "High": 311.5,
+      "Low": 311.0,
+      "Open": 311.2,
+      "Volume": 42740,
+      "index": null
+    },
+    {
+      "Close": 310.95,
+      "Date": "2018-01-01T09:18:00.000",
+      "High": 311.1,
+      "Low": 310.65,
+      "Open": 311.1,
+      "Volume": 42234,
+      "index": null
+    },
+    {
+      "Close": 311.15,
+      "Date": "2018-01-01T09:19:00.000",
+      "High": 311.15,
+      "Low": 310.85,
+      "Open": 310.95,
+      "Volume": 29874,
+      "index": null
+    }
+  ],
+  "schema": "Date: timestamp[ns]\nOpen: double\nHigh: double\nLow: double\nClose: double\nVolume: int64\nindex: double\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 848",
+  "sha256": "2db7b2c0a2f2daacc7f35d3ac56afc9b3125297872ebdcd69cdeef221698d7b9",
+  "source_commit": "af4d583e9bc0b5d7567b33bd5ec575cee5cbae3a",
+  "source_repository": "rahulkanadia/IndianMarkets_DataBackfill",
+  "strategy_outcomes_computed": false,
+  "timestamp_column": "Date",
+  "timezone": "None"
+}
