@@ -31,11 +31,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git clone --depth 1 --filter=blob:none --sparse \
-            https://github.com/rahulkanadia/IndianMarkets_DataBackfill.git source_data
-          git -C source_data sparse-checkout set SBIN.parquet
+          mkdir -p source_data
+          curl --fail --location --retry 3 --retry-all-errors \
+            --output source_data/SBIN.parquet \
+            https://raw.githubusercontent.com/rahulkanadia/IndianMarkets_DataBackfill/main/SBIN.parquet
           test -s source_data/SBIN.parquet
-          git -C source_data rev-parse HEAD > source_commit.txt
+          git ls-remote \
+            https://github.com/rahulkanadia/IndianMarkets_DataBackfill.git \
+            refs/heads/main | cut -f1 > source_commit.txt
+          test -s source_commit.txt
 
       - name: Inspect SBIN data without strategy evaluation
         shell: bash
