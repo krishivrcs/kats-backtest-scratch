@@ -1,0 +1,50 @@
+name: KATS ORB untouched option-data source audit
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "experiments/kats-orb-3stock-fresh/untouched_validation/**"
+      - "experiments/kats-orb-3stock-fresh/tests/test_untouched_source_probe.py"
+      - ".github/workflows/kats_orb_untouched_source_audit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  source-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned dependencies
+        run: python -m pip install -r experiments/kats-orb-3stock-fresh/requirements.txt
+      - name: Full frozen regression suite
+        run: python -m pytest -q experiments/kats-orb-3stock-fresh/tests
+      - name: Download previously used option archive for boundary audit only
+        run: |
+          curl --fail --location --retry 4 --retry-all-errors \
+            "https://www.kaggle.com/api/v1/datasets/download/kaalicharan9080/nse-future-and-options-data?datasetVersionNumber=2" \
+            --output /tmp/nse_fno_v2.zip
+          echo "d190628cb8b962cad61d5b51979c42d9a8791cc9a42822dcf35ba8330c9253f0  /tmp/nse_fno_v2.zip" | sha256sum --check
+      - name: Audit public data catalogues without calculating PnL
+        run: |
+          set -o pipefail
+          mkdir -p experiments/kats-orb-3stock-fresh/results/untouched-source-audit
+          python experiments/kats-orb-3stock-fresh/untouched_validation/source_probe.py \
+            /tmp/nse_fno_v2.zip \
+            --out experiments/kats-orb-3stock-fresh/results/untouched-source-audit \
+            | tee experiments/kats-orb-3stock-fresh/results/untouched-source-audit-summary.txt
+      - name: Upload source evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: kats-orb-untouched-source-audit
+          path: |
+            experiments/kats-orb-3stock-fresh/results/untouched-source-audit/
+            experiments/kats-orb-3stock-fresh/results/untouched-source-audit-summary.txt
+          if-no-files-found: error
+          retention-days: 30
+
