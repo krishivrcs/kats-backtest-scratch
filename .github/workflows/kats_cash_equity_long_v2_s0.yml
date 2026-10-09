@@ -45,6 +45,7 @@ jobs:
           done < <(git diff --name-only 9ee69422210923ba61db42acae59ad74c61c0ec3 HEAD)
       - name: Run bounded S0 safeguards
         run: |
+          set -o pipefail
           python -m pytest -q experiments/kats-orb-3stock-fresh/tests/test_cash_equity_long_v2_s0.py \
             | tee /tmp/s0_test_result.txt
       - name: Download immutable public source asset
