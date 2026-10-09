@@ -181,7 +181,7 @@ def option_members(path: Path) -> dict[date, str]:
                 reader = csv.DictReader(io.TextIOWrapper(raw, encoding="utf-8-sig", errors="replace", newline=""))
                 first = next(reader, None)
                 if first:
-                    members[datetime.strptime(first["Date"], "%Y-%m-%d").date()] = member
+                    members[parse_option_date(first["Date"])] = member
     return members
 
 
@@ -207,9 +207,19 @@ def build_signals(cash: dict[str, dict[date, list[Bar]]], target_days: list[date
     return signals, audit
 
 
+def parse_option_date(value: str) -> date:
+    for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"):
+        try:
+            return datetime.strptime(value.strip(), fmt).date()
+        except ValueError:
+            pass
+    raise ValueError(f"unsupported option date: {value!r}")
+
+
 def parse_option_time(row: dict[str, str]) -> datetime:
-    naive = datetime.strptime(f"{row['Date']} {row['Time']}", "%Y-%m-%d %H:%M:%S")
-    return naive.replace(tzinfo=IST)
+    parsed_day = parse_option_date(row["Date"])
+    parsed_time = datetime.strptime(row["Time"].strip(), "%H:%M:%S").time()
+    return datetime.combine(parsed_day, parsed_time, IST)
 
 
 def load_day_options(zf: zipfile.ZipFile, member: str, needed: dict[str, str]) -> dict[str, tuple[Contract, list[Bar]]]:
