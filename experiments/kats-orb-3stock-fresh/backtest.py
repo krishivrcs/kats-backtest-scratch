@@ -86,6 +86,13 @@ def lot_size(symbol: str, day: date) -> int:
     raise ValueError(symbol)
 
 
+def contract_reference_price(signal: Signal) -> float:
+    """Put adjusted cash and raw option strikes onto the same dated basis."""
+    if signal.symbol == "RELIANCE" and signal.day <= date(2024, 10, 25):
+        return signal.underlying_close * 2.0
+    return signal.underlying_close
+
+
 def slippage(price: float, pct: float, minimum: float) -> float:
     return max(price * pct, minimum)
 
@@ -245,9 +252,10 @@ def select_contract(signal: Signal, day_contracts: dict[str, tuple[Contract, lis
         return None, []
     expiry = min(contract.expiry for contract in available)
     expiry_contracts = [contract for contract in available if contract.expiry == expiry]
+    reference_price = contract_reference_price(signal)
     def strike_key(contract: Contract):
         tie = contract.strike if option_type == "CE" else -contract.strike
-        return (abs(contract.strike - signal.underlying_close), tie)
+        return (abs(contract.strike - reference_price), tie)
     chosen = min(expiry_contracts, key=strike_key)
     return chosen, day_contracts[chosen.ticker][1]
 
@@ -314,7 +322,7 @@ def simulate(opportunity: dict, scenario: str, equity: float) -> tuple[dict | No
     return {
         "day": signal.day.isoformat(), "symbol": signal.symbol, "direction": signal.direction,
         "decision_time": signal.decision_time.isoformat(), "rvol": signal.rvol,
-        "underlying_close": signal.underlying_close, "ticker": contract.ticker,
+        "underlying_close": signal.underlying_close, "contract_reference_price": contract_reference_price(signal), "ticker": contract.ticker,
         "expiry": contract.expiry.isoformat(), "strike": contract.strike, "option_type": contract.option_type,
         "lot_size": quantity, "entry_time": entry_bar.timestamp.isoformat(), "entry_price": entry_price,
         "stop": stop, "target": target, "planned_loss": planned_loss,
@@ -427,6 +435,7 @@ def main() -> int:
         "option_data": {"sha256": sha256_file(args.option_zip), "days": [d.isoformat() for d in target_days], "timezone": "naive 09:15:59-15:30:59 interpreted as IST; source semantics not documented"},
         "cash_data": {"sha256": sha256_file(args.stock_zip), "timestamp": "Unix UTC converted to Asia/Kolkata per source README"},
         "lot_size_provenance": {"SBIN": "NSE/FAOP/61369: 1500 to 750", "DLF": "NSE/FAOP/61369: 1650 to 825", "RELIANCE": "250 through 2024-10-25; NSE/CMPT/64652 bonus adjustment to 500 from 2024-10-28"},
+        "corporate_action_basis": "RELIANCE cash history is retroactively adjusted for the 1:1 bonus; pre-2024-10-28 raw option strikes use 2x the adjusted cash close as the selection reference, per NSE/CMPT/64652",
         "signals": sum(len(values) for values in signals.values()),
         "signal_rows": [{**asdict(signal), "day": signal.day.isoformat(), "decision_time": signal.decision_time.isoformat()} for values in signals.values() for signal in values],
         "signal_audit": signal_audit, "scenarios": {},
