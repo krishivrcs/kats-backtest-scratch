@@ -35,6 +35,27 @@ jobs:
             /tmp/nse_fno_v2.zip \
             --out experiments/kats-orb-3stock-fresh/results/data_probe.json \
             | tee experiments/kats-orb-3stock-fresh/results/probe_summary.txt
+      - name: Download independent cash-underlying minute data
+        run: |
+          curl --fail --location --retry 4 --retry-all-errors \
+            "https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip" \
+            --output /tmp/stocks_1m_csvs.zip
+      - name: Download official NSE contract masters where available
+        run: |
+          mkdir -p /tmp/nse_contract_masters
+          for date in 15102024 16102024 17102024 18102024 21102024 22102024 23102024 24102024 25102024 28102024 29102024 30102024 31102024; do
+            url="https://nsearchives.nseindia.com/content/fo/NSE_FO_contract_${date}.csv.gz"
+            curl --fail --location --retry 2 --retry-all-errors "$url" \
+              --output "/tmp/nse_contract_masters/NSE_FO_contract_${date}.csv.gz" \
+              || rm -f "/tmp/nse_contract_masters/NSE_FO_contract_${date}.csv.gz"
+          done
+      - name: Probe cash data and historical lot masters
+        run: |
+          python experiments/kats-orb-3stock-fresh/feasibility_probe.py \
+            /tmp/stocks_1m_csvs.zip \
+            --masters /tmp/nse_contract_masters \
+            --out experiments/kats-orb-3stock-fresh/results/feasibility_probe.json \
+            | tee experiments/kats-orb-3stock-fresh/results/feasibility_summary.txt
       - name: Upload audit only
         uses: actions/upload-artifact@v4
         with:
