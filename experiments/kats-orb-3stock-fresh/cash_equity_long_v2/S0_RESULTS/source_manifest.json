@@ -1,0 +1,119 @@
+{
+  "data_integrity_status": "PASS",
+  "documented_source": "Zerodha Kite API via public research archive; not exchange-authoritative",
+  "expected_bytes": 485923642,
+  "expected_sha256": "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2",
+  "holdout_isolation": "RAW_ROWS_REDUCED_TO_AGGREGATE_INTEGRITY_METADATA; NO_BAR_RETENTION; SIGNAL_ACCESS_GUARD",
+  "integrity": {
+    "holdout_integrity_only": {
+      "missing_expected_session_minutes": 6,
+      "rows": 136119,
+      "session_first_09:15:00": 363,
+      "session_last_15:29:00": 363
+    },
+    "holdout_signal_fields_generated": false,
+    "schema": {
+      "DLF": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ],
+      "RELIANCE": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ],
+      "SBIN": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ]
+    },
+    "symbols": {
+      "DLF": {
+        "earliest_ist": "2024-04-01T09:15:00+05:30",
+        "latest_ist": "2026-04-30T15:29:00+05:30",
+        "member": "DLF_1m.csv.gz",
+        "missing_expected_session_minutes": 590,
+        "outside_expected_session": 60,
+        "rows": 192592,
+        "session_first_09:15:00": 393,
+        "session_first_13:45:00": 1,
+        "session_last_12:29:00": 1,
+        "session_last_14:44:00": 1,
+        "session_last_15:29:00": 392
+      },
+      "RELIANCE": {
+        "earliest_ist": "2024-04-01T09:15:00+05:30",
+        "latest_ist": "2026-04-30T15:29:00+05:30",
+        "member": "RELIANCE_1m.csv.gz",
+        "missing_expected_session_minutes": 590,
+        "outside_expected_session": 60,
+        "rows": 192592,
+        "session_first_09:15:00": 393,
+        "session_first_13:45:00": 1,
+        "session_last_12:29:00": 1,
+        "session_last_14:44:00": 1,
+        "session_last_15:29:00": 392
+      },
+      "SBIN": {
+        "earliest_ist": "2024-04-01T09:15:00+05:30",
+        "latest_ist": "2026-04-30T15:29:00+05:30",
+        "member": "SBIN_1m.csv.gz",
+        "missing_expected_session_minutes": 590,
+        "outside_expected_session": 60,
+        "rows": 192595,
+        "session_first_09:15:00": 393,
+        "session_first_13:45:00": 1,
+        "session_last_12:29:00": 1,
+        "session_last_14:44:00": 1,
+        "session_last_15:29:00": 392
+      }
+    },
+    "totals": {
+      "missing_expected_session_minutes": 1770,
+      "outside_expected_session": 180,
+      "rows": 577779
+    }
+  },
+  "observed_bytes": 485923642,
+  "observed_sha256": "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2",
+  "permitted_signal_range": [
+    "2024-04-01",
+    "2025-10-31"
+  ],
+  "release_asset_id": 410673470,
+  "release_tag": "v1.0.0",
+  "schema_expected": [
+    "time",
+    "open",
+    "high",
+    "low",
+    "close",
+    "CE Breakout Level",
+    "PE Breakout Level",
+    "Volume"
+  ],
+  "sealed_holdout_range": [
+    "2025-11-01",
+    "2026-04-30"
+  ],
+  "sha256_verified": true,
+  "source_url": "https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip",
+  "timestamp_provenance": "Unix seconds interpreted UTC then converted to Asia/Kolkata; interval-start labels supported by README loading example and observed 09:15-15:29 IST session alignment; not exchange-authoritative"
+}

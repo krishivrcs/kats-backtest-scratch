@@ -1,0 +1,25 @@
+{
+  "added_signals": 0,
+  "backtest_run": false,
+  "broker_orders": false,
+  "development_legacy_signals": 5,
+  "development_v2_signals": 5,
+  "direction_changed": 0,
+  "final_verdict": "COMPATIBILITY_PASS",
+  "frozen_signal_compatibility": "PASS",
+  "holdout_signal_accessed": false,
+  "incomplete_5m_buckets": {
+    "QA_strategy_window": 6,
+    "session_total": 6,
+    "strategy_window_total": 6
+  },
+  "malformed_input_records": 0,
+  "pnl_calculated": false,
+  "qa_legacy_signals": 45,
+  "qa_v2_signals": 45,
+  "rank_changed": 0,
+  "removed_signals": 0,
+  "shifted_signals": 0,
+  "validation_legacy_signals": 92,
+  "validation_v2_signals": 92
+}
