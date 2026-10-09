@@ -28,6 +28,9 @@ not interpolated. Data integrity and contract coverage are evaluated before P&L.
 - Opening relative volume is the current 09:15–09:30 cash volume divided by the
   mean for the same window in exactly the prior 20 valid sessions. The current
   day is excluded. Fewer than 20 valid sessions means no signal.
+- A valid session for this lookback has exactly 15 unique one-minute bars from
+  09:15 through 09:29 IST with positive, internally consistent OHLC and
+  non-negative volume. Suspicious or missing bars are not repaired.
 - RVOL must be at least 1.50.
 - Long: a later completed five-minute close is strictly above opening-range high.
 - Short: a later completed five-minute close is strictly below opening-range low.
