@@ -1,0 +1,21 @@
+{
+  "asset_bytes": 485923642,
+  "asset_id": 410673470,
+  "asset_name": "stocks_1m_csvs.zip",
+  "asset_sha256": "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2",
+  "download_url": "https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip",
+  "documented_origin": "Zerodha Kite API via public research archive; not exchange-authoritative",
+  "holdout_end": "2026-04-30",
+  "holdout_start": "2025-11-01",
+  "permitted_signal_end": "2025-10-31",
+  "release_id": 316738089,
+  "release_tag": "v1.0.0",
+  "repository": "voletiramu/nse-fno-1min-data",
+  "source_commit": "9ee69422210923ba61db42acae59ad74c61c0ec3",
+  "frozen_blob_shas": {
+    "backtest.py": "a9ea52acbf402934429414529a0a9855785b39f4",
+    "PREREGISTRATION.md": "7472048a44cab0034a6280c478d8a8b0aa8b2b25",
+    "REVIEW_PROTOCOL_ADDENDUM.md": "b0a58ed3668f5808b4660caafb03eaf400bcb550"
+  },
+  "timestamp_documentation": "Unix seconds; parse as UTC and convert to Asia/Kolkata"
+}

@@ -1,0 +1,83 @@
+name: KATS cash equity V2 S0 compatibility gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - research/kats-orb-cash-eq-long-v2
+    paths:
+      - "experiments/kats-orb-3stock-fresh/cash_equity_long_v2/s0/**"
+      - "experiments/kats-orb-3stock-fresh/tests/test_cash_equity_long_v2_s0.py"
+      - ".github/workflows/kats_cash_equity_long_v2_s0.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kats-cash-equity-long-v2-s0
+  cancel-in-progress: false
+
+jobs:
+  integrity-and-compatibility:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned test dependency
+        run: python -m pip install pytest==8.3.5
+      - name: Verify source commit boundary and frozen files
+        run: |
+          git merge-base --is-ancestor 9ee69422210923ba61db42acae59ad74c61c0ec3 HEAD
+          git diff --exit-code 9ee69422210923ba61db42acae59ad74c61c0ec3 HEAD -- \
+            experiments/kats-orb-3stock-fresh/backtest.py \
+            experiments/kats-orb-3stock-fresh/cash_equity_long_v2/PREREGISTRATION.md \
+            experiments/kats-orb-3stock-fresh/cash_equity_long_v2/REVIEW_PROTOCOL_ADDENDUM.md
+          while IFS= read -r changed; do
+            case "$changed" in
+              experiments/kats-orb-3stock-fresh/cash_equity_long_v2/s0/*|experiments/kats-orb-3stock-fresh/tests/test_cash_equity_long_v2_s0.py|.github/workflows/kats_cash_equity_long_v2_s0.yml) ;;
+              *) echo "Out-of-bound change: $changed" >&2; exit 1 ;;
+            esac
+          done < <(git diff --name-only 9ee69422210923ba61db42acae59ad74c61c0ec3 HEAD)
+      - name: Run bounded S0 safeguards
+        run: |
+          python -m pytest -q experiments/kats-orb-3stock-fresh/tests/test_cash_equity_long_v2_s0.py \
+            | tee /tmp/s0_test_result.txt
+      - name: Download immutable public source asset
+        run: |
+          curl --fail --location --retry 5 --retry-all-errors \
+            "https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip" \
+            --output /tmp/stocks_1m_csvs.zip
+      - name: Verify complete source bytes and SHA-256
+        run: |
+          test "$(stat --format=%s /tmp/stocks_1m_csvs.zip)" = "485923642"
+          echo "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2  /tmp/stocks_1m_csvs.zip" | sha256sum --check
+      - name: Run outcome-blind integrity and signal-identity audit
+        run: |
+          mkdir -p /tmp/kats-s0-results
+          python experiments/kats-orb-3stock-fresh/cash_equity_long_v2/s0/audit.py \
+            /tmp/stocks_1m_csvs.zip \
+            --legacy experiments/kats-orb-3stock-fresh/backtest.py \
+            --out /tmp/kats-s0-results \
+            | tee /tmp/kats-s0-results/workflow_summary.txt
+          cp /tmp/s0_test_result.txt /tmp/kats-s0-results/test_result.txt
+          cp experiments/kats-orb-3stock-fresh/cash_equity_long_v2/s0/source_expected.json \
+            /tmp/kats-s0-results/source_expected.json
+      - name: Assert prohibited outputs do not exist
+        run: |
+          if find /tmp/kats-s0-results -type f -print | grep -Ei '(trade|entry|exit|pnl|return|holdout.signal)'; then
+            echo "Forbidden output filename detected" >&2
+            exit 1
+          fi
+          ! grep -R -Ei 'entry_price|exit_price|gross_pnl|net_pnl|return_percent' /tmp/kats-s0-results
+      - name: Upload immutable S0 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: kats-cash-equity-long-v2-s0
+          path: /tmp/kats-s0-results/
+          if-no-files-found: error
+          retention-days: 90
