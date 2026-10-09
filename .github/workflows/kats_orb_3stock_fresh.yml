@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: kats-orb-3stock-fresh
+  cancel-in-progress: true
+
 jobs:
   probe:
     runs-on: ubuntu-latest
