@@ -1,0 +1,44 @@
+name: KATS ORB 3-stock fresh data gate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "experiments/kats-orb-3stock-fresh/**"
+      - ".github/workflows/kats_orb_3stock_fresh.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned test dependency
+        run: python -m pip install -r experiments/kats-orb-3stock-fresh/requirements.txt
+      - name: Unit tests
+        run: python -m pytest -q experiments/kats-orb-3stock-fresh/tests
+      - name: Download public dataset
+        run: |
+          curl --fail --location --retry 4 --retry-all-errors \
+            "https://www.kaggle.com/api/v1/datasets/download/kaalicharan9080/nse-future-and-options-data?datasetVersionNumber=2" \
+            --output /tmp/nse_fno_v2.zip
+      - name: Probe checksums, schema and contract coverage
+        run: |
+          mkdir -p experiments/kats-orb-3stock-fresh/results
+          python experiments/kats-orb-3stock-fresh/probe.py \
+            /tmp/nse_fno_v2.zip \
+            --out experiments/kats-orb-3stock-fresh/results/data_probe.json \
+            | tee experiments/kats-orb-3stock-fresh/results/probe_summary.txt
+      - name: Upload audit only
+        uses: actions/upload-artifact@v4
+        with:
+          name: kats-orb-fresh-data-probe
+          path: experiments/kats-orb-3stock-fresh/results/
+          if-no-files-found: error
+          retention-days: 30
