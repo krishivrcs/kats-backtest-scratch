@@ -1,0 +1,25 @@
+{
+  "archive_url": "https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip",
+  "archive_sha256": "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2",
+  "symbols": ["HDFCBANK", "ICICIBANK", "SBIN", "RELIANCE", "INFY", "AXISBANK", "KOTAKBANK", "HAL", "TATAMOTORS", "TCS", "DLF"],
+  "partitions": {
+    "qa": ["2024-04-01", "2024-10-14"],
+    "development": ["2024-10-15", "2024-10-31"],
+    "validation": ["2024-11-01", "2025-10-31"],
+    "sealed_holdout": ["2025-11-01", "2026-04-30"]
+  },
+  "official_daily_anchor_dates": ["2024-04-01", "2024-10-15", "2024-11-01", "2025-01-02", "2025-10-31"],
+  "corporate_actions": {
+    "RELIANCE": {
+      "status": "EVIDENCE_IDENTIFIED_RECONCILIATION_REQUIRED",
+      "event": "1:1 bonus; record date 2024-10-28",
+      "sources": ["https://nsearchives.nseindia.com/content/circulars/FAOP64621.pdf", "https://nsearchives.nseindia.com/content/circulars/CMPT64652.pdf"]
+    },
+    "TATAMOTORS": {
+      "status": "IDENTITY_CONTINUITY_UNRESOLVED",
+      "event": "Demerger and TATAMOTORS to TMPV symbol change effective 2025-10-24",
+      "sources": ["https://nsearchives.nseindia.com/content/circulars/FAOP70882.pdf", "https://nsearchives.nseindia.com/content/circulars/CMPT70904.pdf"]
+    }
+  },
+  "entry_timing_status": "REQUIRED_BEFORE_SIMULATION"
+}
