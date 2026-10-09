@@ -1,0 +1,46 @@
+name: KATS 11-stock cash-equity S0 data admission
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [research/kats-orb-cash-eq-11stock-long-v1]
+    paths:
+      - experiments/kats-orb-cash-eq-11stock-long-v1/s0/**
+      - experiments/kats-orb-cash-eq-11stock-long-v1/tests/test_s0_data_admission.py
+      - .github/workflows/kats_orb_cash_eq_11stock_s0.yml
+
+permissions:
+  contents: read
+
+jobs:
+  s0-data-admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify exact research boundary
+        run: |
+          test "${GITHUB_REF_NAME}" = "research/kats-orb-cash-eq-11stock-long-v1"
+          test "$(git rev-parse HEAD^)" = "731a2d2e0c20450d10090a0e93a3a68be5232a9f" || test "$(git merge-base HEAD 731a2d2e0c20450d10090a0e93a3a68be5232a9f)" = "731a2d2e0c20450d10090a0e93a3a68be5232a9f"
+      - name: Run bounded S0 tests
+        run: python -m unittest experiments/kats-orb-cash-eq-11stock-long-v1/tests/test_s0_data_admission.py -v
+      - name: Download and verify frozen public archive
+        run: |
+          curl --fail --location --retry 3 --output /tmp/stocks_1m_csvs.zip https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip
+          echo "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2  /tmp/stocks_1m_csvs.zip" | sha256sum --check
+      - name: Execute structural admission only
+        run: |
+          python experiments/kats-orb-cash-eq-11stock-long-v1/s0/audit.py /tmp/stocks_1m_csvs.zip --expected experiments/kats-orb-cash-eq-11stock-long-v1/s0/source_expected.json --out /tmp/kats-11stock-s0
+      - name: Enforce prohibited-output guard
+        run: |
+          ! find /tmp/kats-11stock-s0 -type f | grep -Ei '(trade|ledger|signal|pnl|return)'
+          ! grep -RniE '"(signal|direction|rank|entry|exit|return|pnl|price)' /tmp/kats-11stock-s0/SOURCE_MANIFEST.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kats-orb-cash-eq-11stock-s0-${{ github.sha }}
+          path: /tmp/kats-11stock-s0/
+          if-no-files-found: error
+          retention-days: 30
