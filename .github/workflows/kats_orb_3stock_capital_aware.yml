@@ -1,0 +1,76 @@
+name: KATS ORB 3-stock capital-aware contracts
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "experiments/kats-orb-3stock-fresh/CAPITAL_AWARE_CONTRACTS_SPEC.md"
+      - "experiments/kats-orb-3stock-fresh/capital_aware_contracts.py"
+      - "experiments/kats-orb-3stock-fresh/tests/test_capital_aware_contracts.py"
+      - ".github/workflows/kats_orb_3stock_capital_aware.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  feasibility:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned dependencies
+        run: python -m pip install -r experiments/kats-orb-3stock-fresh/requirements.txt
+      - name: Full experiment regression tests
+        run: python -m pytest -q experiments/kats-orb-3stock-fresh/tests
+      - name: Download frozen option dataset
+        run: |
+          curl --fail --location --retry 4 --retry-all-errors \
+            "https://www.kaggle.com/api/v1/datasets/download/kaalicharan9080/nse-future-and-options-data?datasetVersionNumber=2" \
+            --output /tmp/nse_fno_v2.zip
+      - name: Download frozen cash-underlying dataset
+        run: |
+          curl --fail --location --retry 4 --retry-all-errors \
+            "https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip" \
+            --output /tmp/stocks_1m_csvs.zip
+      - name: Verify frozen input hashes
+        run: |
+          echo "d190628cb8b962cad61d5b51979c42d9a8791cc9a42822dcf35ba8330c9253f0  /tmp/nse_fno_v2.zip" | sha256sum --check
+          echo "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2  /tmp/stocks_1m_csvs.zip" | sha256sum --check
+      - name: Re-run frozen previous variants
+        run: |
+          python experiments/kats-orb-3stock-fresh/risk_variants.py \
+            /tmp/nse_fno_v2.zip /tmp/stocks_1m_csvs.zip \
+            --out /tmp/previous-regression > /tmp/previous-regression-summary.txt
+          python - <<'PY'
+          import json, math
+          r=json.load(open('/tmp/previous-regression/risk_variant_results.json'))
+          assert r['signals']==5
+          assert r['configs']['control_1pct']['executable_trades']==0
+          assert r['configs']['variant_a_3pct']['executable_trades']==0
+          assert r['configs']['variant_b_1point']['executable_trades']==2
+          assert math.isclose(r['configs']['variant_b_1point']['net_pnl'],-1354.94308342235,abs_tol=1e-9)
+          print('PREVIOUS_VARIANT_REGRESSION=PASS')
+          PY
+      - name: Execute preregistered capital-aware ladder
+        run: |
+          set -o pipefail
+          mkdir -p experiments/kats-orb-3stock-fresh/results/capital-aware
+          python experiments/kats-orb-3stock-fresh/capital_aware_contracts.py \
+            /tmp/nse_fno_v2.zip /tmp/stocks_1m_csvs.zip \
+            --out experiments/kats-orb-3stock-fresh/results/capital-aware \
+            | tee experiments/kats-orb-3stock-fresh/results/capital-aware-summary.txt
+      - name: Upload evidence only
+        uses: actions/upload-artifact@v4
+        with:
+          name: kats-orb-3stock-capital-aware-contracts
+          path: |
+            experiments/kats-orb-3stock-fresh/results/capital-aware/
+            experiments/kats-orb-3stock-fresh/results/capital-aware-summary.txt
+            /tmp/previous-regression/risk_variant_results.json
+            /tmp/previous-regression-summary.txt
+          if-no-files-found: error
+          retention-days: 30
+
