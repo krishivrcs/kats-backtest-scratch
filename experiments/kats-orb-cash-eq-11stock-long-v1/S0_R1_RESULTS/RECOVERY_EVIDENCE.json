@@ -1,0 +1,146 @@
+{
+  "archive_sha256": "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2",
+  "archive_tata_near_names": [
+    "TATACHEM_1M.CSV.GZ",
+    "TATACONSUM_1M.CSV.GZ",
+    "TATAELXSI_1M.CSV.GZ",
+    "TATAPOWER_1M.CSV.GZ",
+    "TATASTEEL_1M.CSV.GZ",
+    "TMPV_1M.CSV.GZ"
+  ],
+  "archive_verified": true,
+  "defects": {
+    "HAL": {
+      "aggregate_additional_anomalies": {},
+      "legacy_defects_permitted": [
+        {
+          "reason": [
+            "INVALID_HIGH_LOW_RELATIONSHIP"
+          ],
+          "row": 21102,
+          "structural_values": {
+            "close": 5368.0,
+            "high": 5368.0,
+            "low": 5347.6,
+            "open": 5375.0,
+            "volume": 72552.0
+          },
+          "timestamp_ist": "2024-06-25T09:15:00+05:30"
+        }
+      ],
+      "malformed_rows": 0,
+      "out_of_order_or_duplicate_steps": 0
+    },
+    "HDFCBANK": {
+      "aggregate_additional_anomalies": {},
+      "legacy_defects_permitted": [
+        {
+          "reason": [
+            "INVALID_HIGH_LOW_RELATIONSHIP"
+          ],
+          "row": 21102,
+          "structural_values": {
+            "close": 839.6,
+            "high": 839.8,
+            "low": 837.4,
+            "open": 835.6,
+            "volume": 370096.0
+          },
+          "timestamp_ist": "2024-06-25T09:15:00+05:30"
+        }
+      ],
+      "malformed_rows": 0,
+      "out_of_order_or_duplicate_steps": 0
+    },
+    "ICICIBANK": {
+      "aggregate_additional_anomalies": {},
+      "legacy_defects_permitted": [
+        {
+          "reason": [
+            "INVALID_HIGH_LOW_RELATIONSHIP"
+          ],
+          "row": 21102,
+          "structural_values": {
+            "close": 1171.75,
+            "high": 1174.35,
+            "low": 1171.0,
+            "open": 1170.25,
+            "volume": 174373.0
+          },
+          "timestamp_ist": "2024-06-25T09:15:00+05:30"
+        }
+      ],
+      "malformed_rows": 0,
+      "out_of_order_or_duplicate_steps": 0
+    }
+  },
+  "holdout_strategy_output_accessed": false,
+  "official_nse_daily": {
+    "date": "2024-06-25",
+    "limitation": "Daily OHLCV cannot establish the disputed 09:15 minute values.",
+    "records": {
+      "HAL": {
+        "CLOSE": "5371.65",
+        "HIGH": "5455",
+        "LOW": "5330",
+        "OPEN": "5375",
+        "TIMESTAMP": "25-JUN-2024",
+        "TOTTRDQTY": "3493916"
+      },
+      "HDFCBANK": {
+        "CLOSE": "1711.35",
+        "HIGH": "1716.95",
+        "LOW": "1671.1",
+        "OPEN": "1671.1",
+        "TIMESTAMP": "25-JUN-2024",
+        "TOTTRDQTY": "37260774"
+      },
+      "ICICIBANK": {
+        "CLOSE": "1197.95",
+        "HIGH": "1206",
+        "LOW": "1167.65",
+        "OPEN": "1170.25",
+        "TIMESTAMP": "25-JUN-2024",
+        "TOTTRDQTY": "27309845"
+      }
+    },
+    "status": "OFFICIAL_DAILY_OBTAINED_NOT_MINUTE_CORROBORATION"
+  },
+  "pnl_calculated": false,
+  "positive_ohlc_kernel": "LEGACY_GAP_CONFIRMED_STRICT_KERNEL_TESTED_SEPARATELY",
+  "scope": "S0_R1_SOURCE_RECOVERY_ONLY",
+  "signals_generated": false,
+  "tatamotors_exact_member": null,
+  "timestamp_ordering_kernel": "LEGACY_GAP_CONFIRMED_SOURCE_ORDER_COUNTS_RECORDED",
+  "tmpv_archive_member": {
+    "compressed_bytes": 2272195,
+    "earliest_ist": "2024-04-01T09:15:00+05:30",
+    "latest_ist": "2026-04-30T15:29:00+05:30",
+    "member": "TMPV_1m.csv.gz",
+    "member_sha256": "ba676a666caa92b66b61b283ec6b4883bed933095566f889430980c129a32058",
+    "rows": 192559,
+    "status": "STRUCTURAL_METADATA_ONLY_NOT_ADMITTED_AS_TATAMOTORS"
+  },
+  "upstox_current_instrument_records": [
+    {
+      "exchange_token": "759782",
+      "instrument_key": "NSE_EQ|INE1TAE01010",
+      "instrument_type": "EQ",
+      "isin": "INE1TAE01010",
+      "name": "TATA MOTORS LIMITED",
+      "segment": "NSE_EQ",
+      "trading_symbol": "TMCV"
+    },
+    {
+      "exchange_token": "3456",
+      "instrument_key": "NSE_EQ|INE155A01022",
+      "instrument_type": "EQ",
+      "isin": "INE155A01022",
+      "name": "TATA MOTORS PASS VEH LTD",
+      "segment": "NSE_EQ",
+      "trading_symbol": "TMPV"
+    }
+  ],
+  "upstox_historical_probe": "AUTH_REQUIRED_NOT_EXECUTED",
+  "zerodha_historical_probe": "AUTH_REQUIRED_NOT_EXECUTED"
+}
