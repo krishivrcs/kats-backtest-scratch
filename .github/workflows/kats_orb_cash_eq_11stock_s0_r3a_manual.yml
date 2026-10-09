@@ -1,0 +1,71 @@
+name: KATS 11-stock S0-R3a manual QA verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  s0-r3a-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out immutable repair commit
+        uses: actions/checkout@v4
+        with:
+          ref: 98fb16d73eb4c1105c66d15b2da848f489fe96ca
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Verify repair source and parent
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "98fb16d73eb4c1105c66d15b2da848f489fe96ca"
+          test "$(git rev-parse HEAD^)" = "093b02623462adb9dddc6e7160952481fd5beb1d"
+          echo "CHECKED_OUT_SOURCE_SHA=$(git rev-parse HEAD)"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run repaired strict-integrity regressions
+        run: python -m unittest experiments/kats-orb-cash-eq-11stock-long-v1/s0_r3/test_strict_integrity.py -v
+
+      - name: Download and verify frozen public archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --output /tmp/stocks.zip https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip
+          echo "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2  /tmp/stocks.zip" | sha256sum --check
+
+      - name: Execute bounded QA-only integrity gate
+        run: python experiments/kats-orb-cash-eq-11stock-long-v1/s0_r3/strict_integrity.py /tmp/stocks.zip --out /tmp/s0-r3a
+
+      - name: Enforce frozen safety flags and exact exceptions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          evidence=json.load(open('/tmp/s0-r3a/STRICT_QA_EVIDENCE.json'))
+          assert evidence['three_qa_exceptions_recorded'] is True
+          assert evidence['signals_generated'] is False
+          assert evidence['pnl_calculated'] is False
+          assert evidence['holdout_accessed'] is False
+          assert evidence['broker_orders'] is False
+          assert set(evidence['symbols']) == {'HDFCBANK', 'ICICIBANK', 'HAL'}
+          for result in evidence['symbols'].values():
+              assert result['opening_range_eligible'] is False
+              assert result['issues']['INVALID_OHLC_RELATIONSHIP'] == 1
+          print('S0_R3A_SAFETY_ASSERTIONS=PASS')
+          PY
+
+      - name: Upload immutable S0-R3a QA evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: kats-11stock-s0-r3a-98fb16d73eb4c1105c66d15b2da848f489fe96ca-${{ github.run_id }}
+          path: /tmp/s0-r3a/STRICT_QA_EVIDENCE.json
+          if-no-files-found: error
+          retention-days: 30
