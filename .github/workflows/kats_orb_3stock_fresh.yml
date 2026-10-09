@@ -16,6 +16,8 @@ concurrency:
 
 jobs:
   probe:
+    # Safety isolation: this branch authorizes S0 integrity/compatibility only.
+    if: github.ref != 'refs/heads/research/kats-orb-cash-eq-long-v2'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
