@@ -5,7 +5,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from backtest import Bar, Contract, IST, Signal, aggregate_5m, charges, lot_size, parse_option_date, parse_option_ticker, signal_for_day, simulate
+from backtest import Bar, Contract, IST, Signal, aggregate_5m, charges, contract_reference_price, lot_size, parse_option_date, parse_option_ticker, signal_for_day, simulate
 
 
 def test_option_identity_and_historical_lots():
@@ -20,6 +20,13 @@ def test_option_identity_and_historical_lots():
 def test_observed_option_date_format_is_explicitly_supported():
     assert parse_option_date("31/10/2024") == date(2024, 10, 31)
     assert parse_option_date("2024-10-31") == date(2024, 10, 31)
+
+
+def test_reliance_bonus_basis_is_dated_and_deterministic():
+    before = Signal("RELIANCE", date(2024, 10, 25), "LONG", datetime(2024, 10, 25, 10, tzinfo=IST), 1350, 2, 0.01)
+    after = Signal("RELIANCE", date(2024, 10, 28), "LONG", datetime(2024, 10, 28, 10, tzinfo=IST), 1350, 2, 0.01)
+    assert contract_reference_price(before) == 2700
+    assert contract_reference_price(after) == 1350
 
 
 def test_completed_five_minute_aggregation():
