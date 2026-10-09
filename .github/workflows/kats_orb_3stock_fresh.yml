@@ -56,6 +56,12 @@ jobs:
             --masters /tmp/nse_contract_masters \
             --out experiments/kats-orb-3stock-fresh/results/feasibility_probe.json \
             | tee experiments/kats-orb-3stock-fresh/results/feasibility_summary.txt
+      - name: Run frozen fresh backtest
+        run: |
+          python experiments/kats-orb-3stock-fresh/backtest.py \
+            /tmp/nse_fno_v2.zip /tmp/stocks_1m_csvs.zip \
+            --out experiments/kats-orb-3stock-fresh/results/backtest \
+            | tee experiments/kats-orb-3stock-fresh/results/backtest_summary.txt
       - name: Upload audit only
         uses: actions/upload-artifact@v4
         with:
