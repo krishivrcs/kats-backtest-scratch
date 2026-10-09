@@ -44,6 +44,10 @@ not interpolated. Data integrity and contract coverage are evaluated before P&L.
   remaining. Select the strike nearest the underlying breakout close; an exact
   tie selects the lower strike for CE and higher strike for PE.
 - The contract must exist and have positive volume at the decision/entry time.
+- RELIANCE's cash source is retroactively adjusted for the October 28, 2024
+  1:1 bonus while pre-bonus option strikes are raw. For contract selection only,
+  pre-October-28 adjusted cash closes are multiplied by the official factor of
+  two. The signal and volume series are not altered.
 - Entry is the next option one-minute candle open strictly after the completed
   breakout bar. No same-bar fill. If absent for more than two minutes: NO_FILL.
 
