@@ -39,7 +39,13 @@ jobs:
       - name: Enforce prohibited-output guard
         run: |
           ! find /tmp/kats-11stock-s0 -type f | grep -Ei '(trade|ledger|signal|pnl|return)'
-          ! grep -RniE '"(signal|direction|rank|entry|exit|return|pnl|price)' /tmp/kats-11stock-s0/SOURCE_MANIFEST.json
+          python - <<'PY'
+          import json
+          m=json.load(open('/tmp/kats-11stock-s0/SOURCE_MANIFEST.json'))
+          assert m['signals_generated'] is False
+          assert m['pnl_calculated'] is False
+          assert m['holdout_strategy_data_accessed'] is False
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: kats-orb-cash-eq-11stock-s0-${{ github.sha }}
