@@ -1,0 +1,575 @@
+{
+  "archive_bytes": 485923642,
+  "archive_hash_verified": true,
+  "archive_sha256": "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2",
+  "archive_url": "https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip",
+  "corporate_actions": {
+    "RELIANCE": {
+      "event": "1:1 bonus; record date 2024-10-28",
+      "sources": [
+        "https://nsearchives.nseindia.com/content/circulars/FAOP64621.pdf",
+        "https://nsearchives.nseindia.com/content/circulars/CMPT64652.pdf"
+      ],
+      "status": "EVIDENCE_IDENTIFIED_RECONCILIATION_REQUIRED"
+    },
+    "TATAMOTORS": {
+      "event": "Demerger and TATAMOTORS to TMPV symbol change effective 2025-10-24",
+      "sources": [
+        "https://nsearchives.nseindia.com/content/circulars/FAOP70882.pdf",
+        "https://nsearchives.nseindia.com/content/circulars/CMPT70904.pdf"
+      ],
+      "status": "IDENTITY_CONTINUITY_UNRESOLVED"
+    }
+  },
+  "entry_timing_clarification": "REQUIRED_BEFORE_SIMULATION",
+  "holdout_strategy_data_accessed": false,
+  "hypothesis": "KATS-ORB-CASH-EQ-11STOCK-LONG-V1",
+  "members_found": 10,
+  "nse_daily_crosscheck_status": "UNRESOLVED_PRIMARY_DAILY_RECONCILIATION_NOT_EXECUTED",
+  "partitions": {
+    "development": [
+      "2024-10-15",
+      "2024-10-31"
+    ],
+    "qa": [
+      "2024-04-01",
+      "2024-10-14"
+    ],
+    "sealed_holdout": [
+      "2025-11-01",
+      "2026-04-30"
+    ],
+    "validation": [
+      "2024-11-01",
+      "2025-10-31"
+    ]
+  },
+  "pnl_calculated": false,
+  "scope": "S0_DATA_ONLY",
+  "signals_generated": false,
+  "symbols": {
+    "AXISBANK": {
+      "compressed_bytes": 2367772,
+      "duplicates": 0,
+      "earliest_ist": "2024-04-01T09:15:00+05:30",
+      "invalid_ohlcv": 0,
+      "latest_ist": "2026-04-30T15:29:00+05:30",
+      "member": "AXISBANK_1m.csv.gz",
+      "member_sha256": "65b9c0c379b74bcd30d52e8017395b07bc5ec9d719d988ada5487daf8e9327cc",
+      "nonfinite_or_parse_errors": 0,
+      "off_grid": 0,
+      "outside_session": 60,
+      "partitions": {
+        "development": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 4875,
+          "sessions": 13
+        },
+        "qa": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 275,
+          "rows": 49975,
+          "sessions": 134
+        },
+        "sealed_holdout": {
+          "incomplete_sessions": 1,
+          "missing_minutes": 2,
+          "rows": 45373,
+          "sessions": 121
+        },
+        "validation": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 690,
+          "rows": 92370,
+          "sessions": 248
+        }
+      },
+      "rows": 192593,
+      "schema": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ],
+      "schema_ok": true,
+      "timestamp_unit": "unix_seconds",
+      "timezone_interpretation": "UTC epoch converted to Asia/Kolkata"
+    },
+    "DLF": {
+      "compressed_bytes": 2319443,
+      "duplicates": 0,
+      "earliest_ist": "2024-04-01T09:15:00+05:30",
+      "invalid_ohlcv": 0,
+      "latest_ist": "2026-04-30T15:29:00+05:30",
+      "member": "DLF_1m.csv.gz",
+      "member_sha256": "ccb8741261cd18652777287a8a647630565e72f5f6cd8c7635df3e1630f2d717",
+      "nonfinite_or_parse_errors": 0,
+      "off_grid": 0,
+      "outside_session": 60,
+      "partitions": {
+        "development": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 4875,
+          "sessions": 13
+        },
+        "qa": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 275,
+          "rows": 49975,
+          "sessions": 134
+        },
+        "sealed_holdout": {
+          "incomplete_sessions": 1,
+          "missing_minutes": 3,
+          "rows": 45372,
+          "sessions": 121
+        },
+        "validation": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 690,
+          "rows": 92370,
+          "sessions": 248
+        }
+      },
+      "rows": 192592,
+      "schema": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ],
+      "schema_ok": true,
+      "timestamp_unit": "unix_seconds",
+      "timezone_interpretation": "UTC epoch converted to Asia/Kolkata"
+    },
+    "HAL": {
+      "compressed_bytes": 2594450,
+      "duplicates": 0,
+      "earliest_ist": "2024-04-01T09:15:00+05:30",
+      "invalid_ohlcv": 1,
+      "latest_ist": "2026-04-30T15:29:00+05:30",
+      "member": "HAL_1m.csv.gz",
+      "member_sha256": "616b08f8bb0c3ddd2310c79a200e282988f4ee3a941847f43e1d78c965b3302d",
+      "nonfinite_or_parse_errors": 0,
+      "off_grid": 0,
+      "outside_session": 60,
+      "partitions": {
+        "development": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 4875,
+          "sessions": 13
+        },
+        "qa": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 275,
+          "rows": 49975,
+          "sessions": 134
+        },
+        "sealed_holdout": {
+          "incomplete_sessions": 1,
+          "missing_minutes": 1,
+          "rows": 45374,
+          "sessions": 121
+        },
+        "validation": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 690,
+          "rows": 92370,
+          "sessions": 248
+        }
+      },
+      "rows": 192594,
+      "schema": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ],
+      "schema_ok": true,
+      "timestamp_unit": "unix_seconds",
+      "timezone_interpretation": "UTC epoch converted to Asia/Kolkata"
+    },
+    "HDFCBANK": {
+      "compressed_bytes": 2205546,
+      "duplicates": 0,
+      "earliest_ist": "2024-04-01T09:15:00+05:30",
+      "invalid_ohlcv": 1,
+      "latest_ist": "2026-04-30T15:29:00+05:30",
+      "member": "HDFCBANK_1m.csv.gz",
+      "member_sha256": "e7727769383fc4ea9291c0ef839fb7e4e77dcd2ceb173f2b713485c18975293b",
+      "nonfinite_or_parse_errors": 0,
+      "off_grid": 0,
+      "outside_session": 60,
+      "partitions": {
+        "development": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 4875,
+          "sessions": 13
+        },
+        "qa": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 275,
+          "rows": 49975,
+          "sessions": 134
+        },
+        "sealed_holdout": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 45375,
+          "sessions": 121
+        },
+        "validation": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 690,
+          "rows": 92370,
+          "sessions": 248
+        }
+      },
+      "rows": 192595,
+      "schema": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ],
+      "schema_ok": true,
+      "timestamp_unit": "unix_seconds",
+      "timezone_interpretation": "UTC epoch converted to Asia/Kolkata"
+    },
+    "ICICIBANK": {
+      "compressed_bytes": 2382514,
+      "duplicates": 0,
+      "earliest_ist": "2024-04-01T09:15:00+05:30",
+      "invalid_ohlcv": 1,
+      "latest_ist": "2026-04-30T15:29:00+05:30",
+      "member": "ICICIBANK_1m.csv.gz",
+      "member_sha256": "225bf9b89cc9b657f56c22151ffda1963c6aea9964b38dfb3ab6b8c3e3103ba6",
+      "nonfinite_or_parse_errors": 0,
+      "off_grid": 0,
+      "outside_session": 60,
+      "partitions": {
+        "development": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 4875,
+          "sessions": 13
+        },
+        "qa": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 275,
+          "rows": 49975,
+          "sessions": 134
+        },
+        "sealed_holdout": {
+          "incomplete_sessions": 1,
+          "missing_minutes": 2,
+          "rows": 45373,
+          "sessions": 121
+        },
+        "validation": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 690,
+          "rows": 92370,
+          "sessions": 248
+        }
+      },
+      "rows": 192593,
+      "schema": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ],
+      "schema_ok": true,
+      "timestamp_unit": "unix_seconds",
+      "timezone_interpretation": "UTC epoch converted to Asia/Kolkata"
+    },
+    "INFY": {
+      "compressed_bytes": 2443403,
+      "duplicates": 0,
+      "earliest_ist": "2024-04-01T09:15:00+05:30",
+      "invalid_ohlcv": 0,
+      "latest_ist": "2026-04-30T15:29:00+05:30",
+      "member": "INFY_1m.csv.gz",
+      "member_sha256": "6fb33a0a9835439ccca1362cacec576be88bb1b633fb7913ab6071b5ce785c1d",
+      "nonfinite_or_parse_errors": 0,
+      "off_grid": 0,
+      "outside_session": 60,
+      "partitions": {
+        "development": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 4875,
+          "sessions": 13
+        },
+        "qa": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 275,
+          "rows": 49975,
+          "sessions": 134
+        },
+        "sealed_holdout": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 45375,
+          "sessions": 121
+        },
+        "validation": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 690,
+          "rows": 92370,
+          "sessions": 248
+        }
+      },
+      "rows": 192595,
+      "schema": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ],
+      "schema_ok": true,
+      "timestamp_unit": "unix_seconds",
+      "timezone_interpretation": "UTC epoch converted to Asia/Kolkata"
+    },
+    "KOTAKBANK": {
+      "compressed_bytes": 1902624,
+      "duplicates": 0,
+      "earliest_ist": "2024-04-01T09:15:00+05:30",
+      "invalid_ohlcv": 0,
+      "latest_ist": "2026-04-30T15:29:00+05:30",
+      "member": "KOTAKBANK_1m.csv.gz",
+      "member_sha256": "76d46e998406a03a2cc85a6bbca86aa8cd460e263342034743606350e92883c8",
+      "nonfinite_or_parse_errors": 0,
+      "off_grid": 0,
+      "outside_session": 60,
+      "partitions": {
+        "development": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 4875,
+          "sessions": 13
+        },
+        "qa": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 275,
+          "rows": 49975,
+          "sessions": 134
+        },
+        "sealed_holdout": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 3,
+          "rows": 45372,
+          "sessions": 121
+        },
+        "validation": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 690,
+          "rows": 92370,
+          "sessions": 248
+        }
+      },
+      "rows": 192592,
+      "schema": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ],
+      "schema_ok": true,
+      "timestamp_unit": "unix_seconds",
+      "timezone_interpretation": "UTC epoch converted to Asia/Kolkata"
+    },
+    "RELIANCE": {
+      "compressed_bytes": 2383695,
+      "duplicates": 0,
+      "earliest_ist": "2024-04-01T09:15:00+05:30",
+      "invalid_ohlcv": 0,
+      "latest_ist": "2026-04-30T15:29:00+05:30",
+      "member": "RELIANCE_1m.csv.gz",
+      "member_sha256": "a66c91f2967d71cec19caca08ed5dc199106926de37401d8412b283bfeae9ca2",
+      "nonfinite_or_parse_errors": 0,
+      "off_grid": 0,
+      "outside_session": 60,
+      "partitions": {
+        "development": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 4875,
+          "sessions": 13
+        },
+        "qa": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 275,
+          "rows": 49975,
+          "sessions": 134
+        },
+        "sealed_holdout": {
+          "incomplete_sessions": 1,
+          "missing_minutes": 3,
+          "rows": 45372,
+          "sessions": 121
+        },
+        "validation": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 690,
+          "rows": 92370,
+          "sessions": 248
+        }
+      },
+      "rows": 192592,
+      "schema": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ],
+      "schema_ok": true,
+      "timestamp_unit": "unix_seconds",
+      "timezone_interpretation": "UTC epoch converted to Asia/Kolkata"
+    },
+    "SBIN": {
+      "compressed_bytes": 2346097,
+      "duplicates": 0,
+      "earliest_ist": "2024-04-01T09:15:00+05:30",
+      "invalid_ohlcv": 0,
+      "latest_ist": "2026-04-30T15:29:00+05:30",
+      "member": "SBIN_1m.csv.gz",
+      "member_sha256": "cd0ff2038bdfba4f0bd95cba9d891ee5a212630e405eb9db95e606882f3ceeeb",
+      "nonfinite_or_parse_errors": 0,
+      "off_grid": 0,
+      "outside_session": 60,
+      "partitions": {
+        "development": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 4875,
+          "sessions": 13
+        },
+        "qa": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 275,
+          "rows": 49975,
+          "sessions": 134
+        },
+        "sealed_holdout": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 45375,
+          "sessions": 121
+        },
+        "validation": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 690,
+          "rows": 92370,
+          "sessions": 248
+        }
+      },
+      "rows": 192595,
+      "schema": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ],
+      "schema_ok": true,
+      "timestamp_unit": "unix_seconds",
+      "timezone_interpretation": "UTC epoch converted to Asia/Kolkata"
+    },
+    "TATAMOTORS": null,
+    "TCS": {
+      "compressed_bytes": 2516976,
+      "duplicates": 0,
+      "earliest_ist": "2024-04-01T09:15:00+05:30",
+      "invalid_ohlcv": 0,
+      "latest_ist": "2026-04-30T15:29:00+05:30",
+      "member": "TCS_1m.csv.gz",
+      "member_sha256": "79252a68433f31dcf05540009c132e0fb2cc2594cb826ee9cd2bff5e49a0af51",
+      "nonfinite_or_parse_errors": 0,
+      "off_grid": 0,
+      "outside_session": 60,
+      "partitions": {
+        "development": {
+          "incomplete_sessions": 0,
+          "missing_minutes": 0,
+          "rows": 4875,
+          "sessions": 13
+        },
+        "qa": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 275,
+          "rows": 49975,
+          "sessions": 134
+        },
+        "sealed_holdout": {
+          "incomplete_sessions": 1,
+          "missing_minutes": 3,
+          "rows": 45372,
+          "sessions": 121
+        },
+        "validation": {
+          "incomplete_sessions": 2,
+          "missing_minutes": 690,
+          "rows": 92370,
+          "sessions": 248
+        }
+      },
+      "rows": 192592,
+      "schema": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CE Breakout Level",
+        "PE Breakout Level",
+        "Volume"
+      ],
+      "schema_ok": true,
+      "timestamp_unit": "unix_seconds",
+      "timezone_interpretation": "UTC epoch converted to Asia/Kolkata"
+    }
+  },
+  "timestamp_provenance": "Unix-second epoch interpreted UTC then converted to Asia/Kolkata; interval-label semantics require independent source confirmation",
+  "verdict": "S0_BLOCKED_DATA_INTEGRITY"
+}
