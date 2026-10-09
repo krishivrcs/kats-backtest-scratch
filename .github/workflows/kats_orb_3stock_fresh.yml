@@ -62,6 +62,7 @@ jobs:
             | tee experiments/kats-orb-3stock-fresh/results/feasibility_summary.txt
       - name: Run frozen fresh backtest
         run: |
+          set -o pipefail
           python experiments/kats-orb-3stock-fresh/backtest.py \
             /tmp/nse_fno_v2.zip /tmp/stocks_1m_csvs.zip \
             --out experiments/kats-orb-3stock-fresh/results/backtest \
