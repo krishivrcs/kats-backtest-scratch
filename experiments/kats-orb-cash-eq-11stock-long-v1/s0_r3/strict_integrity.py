@@ -13,6 +13,7 @@ import hashlib
 import io
 import json
 import math
+import re
 import zipfile
 from collections import Counter, defaultdict
 from dataclasses import dataclass
@@ -53,7 +54,16 @@ def sha256_file(path: Path) -> str:
 
 
 def parse_timestamp(value: object) -> datetime:
-    dt = datetime.fromtimestamp(int(float(str(value))), tz=timezone.utc).astimezone(IST)
+    if isinstance(value, bool):
+        raise ValueError("MALFORMED_TIMESTAMP")
+    if isinstance(value, int):
+        seconds = value
+    else:
+        token = str(value).strip()
+        if re.fullmatch(r"[+-]?\d+", token) is None:
+            raise ValueError("TIMESTAMP_NOT_EXACT_INTEGER_SECOND")
+        seconds = int(token)
+    dt = datetime.fromtimestamp(seconds, tz=timezone.utc).astimezone(IST)
     if dt.second or dt.microsecond:
         raise ValueError("OFF_GRID_TIMESTAMP")
     return dt

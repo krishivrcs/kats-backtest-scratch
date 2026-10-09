@@ -32,6 +32,25 @@ def row(offset, **overrides):
 
 
 class StrictIntegrityTests(unittest.TestCase):
+    def test_parse_timestamp_accepts_exact_integer_second(self):
+        expected = datetime(2024, 6, 25, 9, 15, tzinfo=IST)
+        self.assertEqual(s.parse_timestamp("1719287100"), expected)
+        self.assertEqual(s.parse_timestamp(1719287100), expected)
+
+    def test_parse_timestamp_rejects_fractional_seconds_without_truncation(self):
+        for value in ("1719287100.5", "1719287100.999", "1719287100.0", 1719287100.5):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                s.parse_timestamp(value)
+
+    def test_parse_timestamp_rejects_off_grid_integer_second(self):
+        with self.assertRaisesRegex(ValueError, "OFF_GRID_TIMESTAMP"):
+            s.parse_timestamp("1719287101")
+
+    def test_parse_timestamp_rejects_nonfinite_and_malformed(self):
+        for value in ("nan", "inf", "-inf", "", "not-a-timestamp", None, True):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                s.parse_timestamp(value)
+
     def test_valid_bar(self):
         self.assertEqual(s.validate_bar(bar()), ())
 
