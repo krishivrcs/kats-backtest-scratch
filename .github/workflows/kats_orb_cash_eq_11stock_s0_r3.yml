@@ -1,0 +1,56 @@
+name: KATS 11-stock S0-R3 strict integrity
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [research/kats-orb-cash-eq-11stock-s0-r3]
+    paths:
+      - experiments/kats-orb-cash-eq-11stock-long-v1/s0_r3/**
+      - .github/workflows/kats_orb_cash_eq_11stock_s0_r3.yml
+
+permissions:
+  contents: read
+
+jobs:
+  strict-integrity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify isolated recovery boundary
+        run: |
+          test "$GITHUB_REF_NAME" = "research/kats-orb-cash-eq-11stock-s0-r3"
+          test "$(git merge-base HEAD a665c017d53492d5cfa9c4d4026036aca328027c)" = "a665c017d53492d5cfa9c4d4026036aca328027c"
+      - name: Run synthetic strict-integrity regressions
+        run: python -m unittest experiments/kats-orb-cash-eq-11stock-long-v1/s0_r3/test_strict_integrity.py -v
+      - name: Download and verify frozen public archive
+        run: |
+          curl --fail --location --retry 3 --output /tmp/stocks.zip https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip
+          echo "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2  /tmp/stocks.zip" | sha256sum --check
+      - name: Execute bounded QA-only integrity gate
+        run: python experiments/kats-orb-cash-eq-11stock-long-v1/s0_r3/strict_integrity.py /tmp/stocks.zip --out /tmp/s0-r3
+      - name: Enforce safety flags and exact exceptions
+        run: |
+          python - <<'PY'
+          import json
+          evidence=json.load(open('/tmp/s0-r3/STRICT_QA_EVIDENCE.json'))
+          assert evidence['three_qa_exceptions_recorded'] is True
+          assert evidence['signals_generated'] is False
+          assert evidence['pnl_calculated'] is False
+          assert evidence['holdout_accessed'] is False
+          assert evidence['broker_orders'] is False
+          for result in evidence['symbols'].values():
+              assert result['opening_range_eligible'] is False
+              assert result['issues']['INVALID_OHLC_RELATIONSHIP'] == 1
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kats-11stock-s0-r3-${{ github.sha }}
+          path: /tmp/s0-r3/STRICT_QA_EVIDENCE.json
+          if-no-files-found: error
+          retention-days: 30
