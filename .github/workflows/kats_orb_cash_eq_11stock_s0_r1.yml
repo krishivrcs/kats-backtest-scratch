@@ -1,0 +1,45 @@
+name: KATS 11-stock S0-R1 source recovery
+on:
+  workflow_dispatch:
+  push:
+    branches: [research/kats-orb-cash-eq-11stock-s0-r1]
+    paths:
+      - experiments/kats-orb-cash-eq-11stock-long-v1/s0_r1/**
+      - .github/workflows/kats_orb_cash_eq_11stock_s0_r1.yml
+permissions:
+  contents: read
+jobs:
+  recovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Verify immutable parent and branch
+        run: |
+          test "$GITHUB_REF_NAME" = "research/kats-orb-cash-eq-11stock-s0-r1"
+          test "$(git merge-base HEAD 926ce44df9673db7e84c17e621ea58d26b5df003)" = "926ce44df9673db7e84c17e621ea58d26b5df003"
+      - name: Run isolated synthetic kernel tests
+        run: python -m unittest experiments/kats-orb-cash-eq-11stock-long-v1/s0_r1/test_integrity_kernel.py -v
+      - name: Download frozen archive and public Upstox instrument master
+        run: |
+          curl -fL --retry 3 -o /tmp/stocks.zip https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip
+          echo "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2  /tmp/stocks.zip" | sha256sum -c -
+          curl -fL --retry 3 -o /tmp/NSE.json.gz https://assets.upstox.com/market-quote/instruments/exchange/NSE.json.gz
+      - name: Execute outcome-blind recovery audit
+        run: python experiments/kats-orb-cash-eq-11stock-long-v1/s0_r1/source_recovery.py /tmp/stocks.zip --master /tmp/NSE.json.gz --out /tmp/s0-r1
+      - name: Enforce scope flags
+        run: |
+          python - <<'PY'
+          import json
+          m=json.load(open('/tmp/s0-r1/RECOVERY_EVIDENCE.json'))
+          assert m['signals_generated'] is False and m['pnl_calculated'] is False
+          assert m['holdout_strategy_output_accessed'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kats-11stock-s0-r1-${{ github.sha }}
+          path: /tmp/s0-r1/
+          retention-days: 30
