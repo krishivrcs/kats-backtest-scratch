@@ -1,0 +1,62 @@
+{
+  "project": "KATS-ORB-CASH-EQ-11STOCK-LONG-V1",
+  "gate": "S0-R4A",
+  "accepted_source_commit": "98fb16d73eb4c1105c66d15b2da848f489fe96ca",
+  "observation_cutoff_inclusive": "2025-10-31",
+  "sealed_holdout_start": "2025-11-01",
+  "archive": {
+    "url": "https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip",
+    "bytes": 485923642,
+    "sha256": "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2",
+    "members": {
+      "HDFCBANK_1m.csv.gz": "e7727769383fc4ea9291c0ef839fb7e4e77dcd2ceb173f2b713485c18975293b",
+      "RELIANCE_1m.csv.gz": "a66c91f2967d71cec19caca08ed5dc199106926de37401d8412b283bfeae9ca2",
+      "TMPV_1m.csv.gz": "ba676a666caa92b66b61b283ec6b4883bed933095566f889430980c129a32058"
+    },
+    "exact_tatamotors_member_present": false
+  },
+  "nse_daily_archives": [
+    {"date":"2024-06-25","url":"https://nsearchives.nseindia.com/content/historical/EQUITIES/2024/JUN/cm25JUN2024bhav.csv.zip","sha256":"599659b98cf9259aabbd6345b2cfca346751a7c59248f3688978b21917db8ce6"},
+    {"date":"2024-10-25","url":"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20241025_F_0000.csv.zip","sha256":"1bffc104f8ab173eac972d0ef4a14dd609eb3e54138dac547817d8a6659b7e6c"},
+    {"date":"2024-10-28","url":"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20241028_F_0000.csv.zip","sha256":"d7864c97d02bdbbcf25c7d33cdaa3bf1575808ebaa3d5b64a25b9cff05320c37"},
+    {"date":"2024-10-29","url":"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20241029_F_0000.csv.zip","sha256":"c3ad7971fc38c210c8dcbb26ee754b2ea894e1885d1db9ca07bdea9943e7ef7f"},
+    {"date":"2024-10-30","url":"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20241030_F_0000.csv.zip","sha256":"f77cb6942f893fdc2c7e91f071388106beeec278796da7829a9ab50422ff25ac"},
+    {"date":"2025-08-25","url":"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20250825_F_0000.csv.zip","sha256":"577b4a03a8c51bd7b8633ab142dc66ab88df29b4bd2bcf0f6ae2913fb20f0be4"},
+    {"date":"2025-08-26","url":"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20250826_F_0000.csv.zip","sha256":"fea96c131d1eea45452d257884764e4fffd4fc635e0fb0d02903980b2c77bf50"},
+    {"date":"2025-10-13","url":"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20251013_F_0000.csv.zip","sha256":"b2041ef799e831432238f2add4249502abc69cb60a76f3c686f5bbef2aeabe58"},
+    {"date":"2025-10-14","url":"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20251014_F_0000.csv.zip","sha256":"5bd4f7e4243e8744fc1dfdf7c774eb0b1109c2e6c16e743cd335492973410ed9"},
+    {"date":"2025-10-15","url":"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20251015_F_0000.csv.zip","sha256":"183148681357378c3e3c617e5487e287c53d8a9d2c91e7ef8b100c2721f5a4fe"},
+    {"date":"2025-10-23","url":"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20251023_F_0000.csv.zip","sha256":"f06c74027d8b576d1b3ce7419bdb86472c153f7ac2ce687ed5dc949f2e00a105"},
+    {"date":"2025-10-24","url":"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20251024_F_0000.csv.zip","sha256":"3f4408e0e4271cfe8863320e2ddb67027f464bc6b622bfb08a3dca1371e8f76e"},
+    {"date":"2025-10-31","url":"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20251031_F_0000.csv.zip","sha256":"713089e3ac89fd7533d9d5580c30c9feea997b895df25d2b60b0a306cd119f95"}
+  ],
+  "official_corporate_action_sources": [
+    "https://nsearchives.nseindia.com/content/circulars/FAOP69840.pdf",
+    "https://nsearchives.nseindia.com/content/circulars/CML69791.pdf",
+    "https://nsearchives.nseindia.com/content/circulars/FAOP64621.pdf",
+    "https://nsearchives.nseindia.com/content/circulars/CMPT64652.pdf",
+    "https://nsearchives.nseindia.com/content/circulars/CML64862.pdf",
+    "https://nsearchives.nseindia.com/content/circulars/CMTR70614.pdf",
+    "https://nsearchives.nseindia.com/content/circulars/FAOP70615.pdf",
+    "https://nsearchives.nseindia.com/content/circulars/FAOP70882.pdf",
+    "https://nsearchives.nseindia.com/content/circulars/CMPT70904.pdf",
+    "https://www.tatamotors.com/press-releases/demerger-of-cv-business-undertaking-of-tata-motors-ltd-into-a-separate-listed-company/"
+  ],
+  "classifications": {
+    "HDFCBANK": "MIXED_OR_TRANSFORMED_SERIES",
+    "RELIANCE": "MIXED_OR_TRANSFORMED_SERIES",
+    "TATAMOTORS_TMPV": "MIXED_OR_TRANSFORMED_SERIES"
+  },
+  "upstox_observations": {
+    "status": "FOUNDER_PROVIDED_RAW_RESPONSES_NOT_AVAILABLE_IN_WORK",
+    "instrument_key": "NSE_EQ|INE155A01022",
+    "dates": ["2025-10-13","2025-10-14","2025-10-15","2025-10-23","2025-10-24","2025-10-31"]
+  },
+  "safety": {
+    "signals_generated": false,
+    "pnl_calculated": false,
+    "holdout_accessed": false,
+    "broker_orders": false,
+    "raw_private_data_committed": false
+  }
+}
