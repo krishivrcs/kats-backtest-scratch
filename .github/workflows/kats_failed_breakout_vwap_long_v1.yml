@@ -1,0 +1,91 @@
+name: KATS failed-breakout VWAP long V1
+
+on:
+  push:
+    branches:
+      - research/kats-failed-breakout-vwap-long-v1
+    paths:
+      - "experiments/kats-failed-breakout-vwap-long-v1/**"
+      - ".github/workflows/kats_failed_breakout_vwap_long_v1.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kats-failed-breakout-vwap-long-v1
+  cancel-in-progress: false
+
+jobs:
+  sequential-gated-backtest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Unit tests
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s experiments/kats-failed-breakout-vwap-long-v1/tests -v \
+            2>&1 | tee /tmp/tests.txt
+
+      - name: Download and verify public archive
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 5 --retry-all-errors \
+            "https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip" \
+            --output /tmp/stocks_1m_csvs.zip
+          echo "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2  /tmp/stocks_1m_csvs.zip" | sha256sum --check
+
+      - name: Execute frozen sequential gate
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/failed-breakout-results
+          cp /tmp/tests.txt /tmp/failed-breakout-results/test-output.txt
+          printf '%s\n' "$GITHUB_SHA" > /tmp/failed-breakout-results/source-commit.txt
+          python experiments/kats-failed-breakout-vwap-long-v1/run.py \
+            /tmp/stocks_1m_csvs.zip --out /tmp/failed-breakout-results \
+            | tee /tmp/failed-breakout-results/run-summary.json
+
+      - name: Reconcile and enforce validation isolation
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import csv, json
+          from pathlib import Path
+          p=Path('/tmp/failed-breakout-results')
+          r=json.loads((p/'results.json').read_text())
+          manifest=json.loads((p/'development_manifest.json').read_text())
+          assert manifest['archive_sha256']=='20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2'
+          assert manifest['maximum_strategy_date_parsed']=='2025-02-28'
+          for name, section in [('development','development'),('development_adverse','development_adverse')]:
+              rows=list(csv.DictReader((p/f'{name}_trades.csv').open()))
+              assert len(rows)==r[section]['trades']
+              assert abs(sum(float(x['net_pnl']) for x in rows)-r[section]['net_pnl'])<1e-7
+              assert abs(sum(float(x['costs']) for x in rows)-r[section]['costs'])<1e-7
+              assert all(x['date']<='2025-02-28' for x in rows)
+              assert all(float(x['planned_risk_pct'])<=0.0100000001 for x in rows)
+          if r['development_gate']=='FAIL':
+              assert r['validation_status']=='NOT_ACCESSED_DEVELOPMENT_GATE_FAILED'
+              assert r['validation'] is None and r['validation_adverse'] is None
+              assert not list(p.glob('validation*'))
+              assert r['verdict']=='REJECT_DEVELOPMENT'
+          else:
+              assert json.loads((p/'validation_manifest.json').read_text())['maximum_strategy_date_parsed']=='2025-10-31'
+              for name, section in [('validation','validation'),('validation_adverse','validation_adverse')]:
+                  rows=list(csv.DictReader((p/f'{name}_trades.csv').open()))
+                  assert len(rows)==r[section]['trades']
+                  assert abs(sum(float(x['net_pnl']) for x in rows)-r[section]['net_pnl'])<1e-7
+                  assert all(x['date']<='2025-10-31' for x in rows)
+          (p/'reconciliation.txt').write_text('RECONCILIATION=PASS\nLIVE_ORDERS=NONE\n')
+          PY
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: kats-failed-breakout-${{ github.run_id }}-${{ github.sha }}
+          path: /tmp/failed-breakout-results/
+          if-no-files-found: error
+          retention-days: 90
