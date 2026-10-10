@@ -1,0 +1,83 @@
+name: KATS INR300 net intraday V1 frozen research
+
+on:
+  push:
+    branches:
+      - research/kats-intraday-300net-v1-20261010
+    paths:
+      - "experiments/kats-intraday-300net-v1/**"
+      - ".github/workflows/kats_intraday_300net_v1.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kats-intraday-300net-v1
+  cancel-in-progress: false
+
+jobs:
+  frozen-intraday-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Freeze checks and risk/cost causality tests
+        run: |
+          set -euo pipefail
+          test -s experiments/kats-intraday-300net-v1/PREREGISTRATION.md
+          python -m unittest discover -s experiments/kats-intraday-300net-v1/tests -v
+      - name: Fetch sha-pinned public historical NSE minute dataset
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 5 --retry-all-errors \
+            "https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip" \
+            --output /tmp/stocks_1m_csvs.zip
+          echo "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2  /tmp/stocks_1m_csvs.zip" | sha256sum --check
+      - name: Run frozen sequential development then gated validation
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/kats-300net-v1
+          echo "$GITHUB_SHA" > /tmp/kats-300net-v1/SOURCE_COMMIT
+          python experiments/kats-intraday-300net-v1/run.py \
+            /tmp/stocks_1m_csvs.zip --out /tmp/kats-300net-v1 \
+            | tee /tmp/kats-300net-v1/stdout.json
+      - name: Recalculate PnL/risk/trade target from saved ledger
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import csv,json,math
+          from pathlib import Path
+          p=Path("/tmp/kats-300net-v1")
+          v=json.loads((p/"results.json").read_text())
+          assert v["source_archive_sha256"]=="20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2"
+          assert v["real_orders"]=="NONE"
+          for part in ("development","validation"):
+              if not isinstance(v[part],dict):continue
+              for case,filepath in (("base",f"{part}_trades.csv"),("adverse",f"{part}_adverse_trades.csv")):
+                  rows=list(csv.DictReader((p/filepath).open()))
+                  stats=v[part][case]
+                  assert len(rows)==stats["trades"]
+                  assert math.isclose(sum(float(x["net_pnl"]) for x in rows),stats["net_pnl"],abs_tol=1e-5)
+                  assert math.isclose(sum(float(x["gross_pnl"]) for x in rows),stats["net_pnl"]+stats["costs"],abs_tol=1e-5)
+                  assert all(float(x["risk_pct"])<=.010000001 for x in rows)
+                  assert all(float(x["planned_risk_net"])<=200.000001 for x in rows)
+                  assert all(float(x["planned_reward_net"])>=300-.00001 for x in rows)
+                  assert all("09:15"<=x["entry_time"][11:16]<="12:36" for x in rows)
+                  assert all(x["exit_time"][11:16]<="15:10" for x in rows)
+                  assert all(x["date"]<=("2025-02-28" if part=="development" else "2025-10-31") for x in rows)
+          if v["verdict"]=="REJECT_DEVELOPMENT":
+              assert v["validation"]=="NOT_ACCESSED"
+              assert not list(p.glob("validation_*.csv"))
+          (p/"RECONCILIATION.txt").write_text("PASS: risk+net target+trade ledger reconciliation\nLIVE_ORDERS=NONE\n")
+          PY
+      - name: Persist evidence including fail-closed diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kats-intraday-300net-v1-${{ github.run_id }}-${{ github.sha }}
+          path: /tmp/kats-300net-v1/
+          if-no-files-found: warn
+          retention-days: 90
