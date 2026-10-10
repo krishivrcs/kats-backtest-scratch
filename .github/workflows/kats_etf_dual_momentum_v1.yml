@@ -1,0 +1,80 @@
+name: KATS ETF dual momentum V1 frozen research
+
+on:
+  push:
+    branches:
+      - research/kats-etf-dual-momentum-v1-20261010
+    paths:
+      - "experiments/kats-etf-dual-momentum-v1/**"
+      - ".github/workflows/kats_etf_dual_momentum_v1.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kats-etf-dual-momentum-v1
+  cancel-in-progress: false
+
+jobs:
+  etf-historical-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Unit tests and frozen source checks
+        run: |
+          set -euo pipefail
+          test -s experiments/kats-etf-dual-momentum-v1/PREREGISTRATION.md
+          test -s experiments/kats-etf-dual-momentum-v1/SOURCE_AMENDMENT_001.md
+          python -m unittest discover -s experiments/kats-etf-dual-momentum-v1/tests -v
+      - name: Install pinned public historical data client
+        run: python -m pip install 'yfinance==0.2.66'
+      - name: Fetch frozen-period ETF price records
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/kats-etf-v1
+          python experiments/kats-etf-dual-momentum-v1/fetch_yahoo.py --out /tmp/kats-etf-v1/prices \
+            | tee /tmp/kats-etf-v1/source-download.txt
+      - name: Source integrity first, then development gate, then conditional validation
+        run: |
+          set -euo pipefail
+          echo "$GITHUB_SHA" > /tmp/kats-etf-v1/source-commit.txt
+          python experiments/kats-etf-dual-momentum-v1/run.py \
+            --data /tmp/kats-etf-v1/prices \
+            --spots experiments/kats-etf-dual-momentum-v1/nse_spot_checks.json \
+            --out /tmp/kats-etf-v1 \
+            | tee /tmp/kats-etf-v1/stdout.json
+      - name: Reconcile saved result to every position
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,csv,math
+          from pathlib import Path
+          p=Path("/tmp/kats-etf-v1")
+          d=json.loads((p/"results.json").read_text())
+          for suffix,section in (("dev","development"),("val","validation")):
+              t=p/f"{suffix}_trades.csv"
+              if not t.exists():continue
+              rows=list(csv.DictReader(t.open()))
+              m=d[section]
+              assert len(rows)==m["completed_trades"]
+              assert math.isclose(sum(float(x["net"]) for x in rows),m["net_pnl"],abs_tol=1e-5)
+              assert math.isclose(sum(float(x["fees"]) for x in rows),m["total_costs"],abs_tol=1e-5)
+              assert math.isclose(sum(float(x["gross"]) for x in rows),m["gross_pnl"],abs_tol=1e-5)
+              assert math.isclose(m["gross_pnl"]-m["total_costs"],m["net_pnl"],abs_tol=1e-5)
+          if d["verdict"]=="REJECT_DEVELOPMENT":
+              assert d["validation"]=="NOT_ACCESSED"
+              assert not (p/"val_trades.csv").exists()
+          (p/"RECONCILIATION.txt").write_text("PASS: trade+cash+fee ledger totals\nREAL_ORDERS=NONE\n")
+          PY
+      - name: Preserve evidence even on source refusal
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kats-etf-dual-momentum-v1-${{ github.run_id }}-${{ github.sha }}
+          path: /tmp/kats-etf-v1/
+          if-no-files-found: warn
+          retention-days: 90
