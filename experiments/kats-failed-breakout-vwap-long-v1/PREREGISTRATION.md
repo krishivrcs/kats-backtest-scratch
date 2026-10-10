@@ -1,6 +1,6 @@
 # KATS-FAILED-BREAKOUT-VWAP-LONG-V1 — preregistration
 
-Frozen before any strategy outcome calculation on 2026-10-10.
+Frozen before any strategy outcome calculation on 2026-10-10. A pre-outcome causality review added the explicit T+60-second entry delay before implementation was executed; no market outcome had been inspected.
 
 ## Lineage and purpose
 
@@ -30,7 +30,7 @@ All decisions use completed five-minute candles.
 4. Failed breakdown precursor: the first completed bar starting at or after 09:30 and ending no later than 12:30 that closes strictly below `OR_LOW`, has a low below `OR_LOW * 0.999`, and volume >= 1.20 times the median volume of the six immediately preceding completed five-minute bars.
 5. Recovery confirmation: within the next three completed five-minute bars, the first bar that closes strictly above `OR_LOW`, closes above its open, and closes above the previous completed bar's close. If no such bar exists, the symbol-date expires. The breakdown extreme is the minimum low from breakdown through recovery.
 6. At recovery completion, freeze the destination at that completed bar's VWAP. The destination must be above the eventual entry fill; a later-moving VWAP is never substituted.
-7. Entry: next five-minute bar open with no same-bar fill. Entry start must be no later than 12:45. Baseline buy fill is raw open plus 5 bps, rounded upward to the INR 0.05 tick.
+7. Entry: the recovery bar completes at decision time T. The model waits one full source minute and uses the open of the one-minute bar stamped T+60 seconds; no OHLCV or volume from that fill minute may qualify the entry. Entry time must be no later than 12:45. Baseline buy fill is that raw open plus 5 bps, rounded upward to the INR 0.05 tick. This explicit delay prevents a zero-latency boundary fill.
 8. Structural stop: one INR 0.05 tick below the breakdown extreme, rounded downward. It is never tightened for affordability.
 9. Exit target: the frozen recovery-completion VWAP, rounded downward to the tick.
 10. Prospective edge gate, evaluated using actual simulated entry fill but before future path: after selecting the maximum affordable/risk-compliant quantity, conservative net profit at the target must be at least 1.50 times all-in planned stop loss. Both include frozen slippage and estimated full round-trip costs. Target must be above entry.
