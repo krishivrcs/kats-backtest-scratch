@@ -49,6 +49,7 @@ def daily_market(raw):
     return market
 
 def mean(values):
+    values=list(values)
     return sum(values)/len(values)
 
 def atr(hist, idx, count=14):
