@@ -1,0 +1,41 @@
+name: KATS ETF V1 independent mechanical recomputation
+
+on:
+  push:
+    branches:
+      - review/kats-etf-dual-momentum-v1-20261010
+    paths:
+      - "review/kats-etf-dual-momentum-v1/**"
+      - ".github/workflows/kats_etf_dual_momentum_v1_audit.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  independent-accounting:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download original frozen-run evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: kats-etf-dual-momentum-v1-38041332940-b93a782e134f0f4ffafcb3bdcf9d1bc8a6ee1c06
+          run-id: 38041332940
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/kats-etf-audit
+      - name: Recompute signals, fills, cost, drawdown, and each trade using separate code
+        run: |
+          set -euo pipefail
+          python review/kats-etf-dual-momentum-v1/audit.py /tmp/kats-etf-audit | tee /tmp/kats-etf-audit/audit_stdout.json
+      - name: Save review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kats-etf-v1-accounting-review-${{ github.run_id }}
+          path: |
+            /tmp/kats-etf-audit/audit_result.json
+            /tmp/kats-etf-audit/audit_stdout.json
+          if-no-files-found: warn
+          retention-days: 90
