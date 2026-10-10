@@ -1,0 +1,84 @@
+name: KATS liquid momentum swing V1 research
+
+on:
+  push:
+    branches:
+      - research/kats-liquid-momentum-swing-v1-20261010
+    paths:
+      - "experiments/kats-liquid-momentum-swing-v1/**"
+      - ".github/workflows/kats_liquid_momentum_swing_v1.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kats-liquid-momentum-swing-v1
+  cancel-in-progress: false
+
+jobs:
+  frozen-prospective-style-backtest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check registered frozen research rules
+        run: |
+          set -euo pipefail
+          test -s experiments/kats-liquid-momentum-swing-v1/PREREGISTRATION.md
+          python -m unittest discover -s experiments/kats-liquid-momentum-swing-v1/tests -v
+
+      - name: Download and verify free public archive
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 5 --retry-all-errors \
+            "https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip" \
+            --output /tmp/stocks_1m_csvs.zip
+          echo "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2  /tmp/stocks_1m_csvs.zip" | sha256sum --check
+
+      - name: Run sequential net-cost backtest
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/kats-momentum-v1
+          echo "$GITHUB_SHA" > /tmp/kats-momentum-v1/SOURCE_COMMIT
+          python experiments/kats-liquid-momentum-swing-v1/run.py \
+            /tmp/stocks_1m_csvs.zip --out /tmp/kats-momentum-v1 \
+            | tee /tmp/kats-momentum-v1/stdout.json
+
+      - name: Independent ledger arithmetic and validation isolation
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,csv
+          from pathlib import Path
+          p=Path("/tmp/kats-momentum-v1")
+          r=json.loads((p/"results.json").read_text())
+          assert r["archive_sha256"]=="20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2"
+          for partition,key in (("dev","development"),("validation","validation")):
+              f=p/f"{partition}_trades.csv"
+              if not f.exists():continue
+              rows=list(csv.DictReader(f.open()))
+              assert len(rows)==r[key]["trades"]
+              assert abs(sum(float(x["net_pnl"]) for x in rows)-r[key]["net_pnl"])<1e-6
+              assert abs(sum(float(x["costs"]) for x in rows)-r[key]["costs"])<1e-6
+              dates=[x["entry_date"] for x in rows]
+              if partition=="dev": assert all("2024-07-01"<=d<="2025-02-28" for d in dates)
+              else: assert all("2025-03-01"<=d<="2025-10-31" for d in dates)
+          if r["verdict"]=="REJECT_DEVELOPMENT":
+              assert r["validation"]=="NOT_ACCESSED"
+              assert not list(p.glob("validation*"))
+              assert not (p/"source_manifest_validation.json").exists()
+          (p/"reconciliation.txt").write_text("LEDGER_RECONCILIATION=PASS\nLIVE_ORDERS=NONE\n")
+          PY
+
+      - name: Persist research evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kats-liquid-momentum-v1-${{ github.run_id }}-${{ github.sha }}
+          path: /tmp/kats-momentum-v1
+          if-no-files-found: warn
+          retention-days: 90
