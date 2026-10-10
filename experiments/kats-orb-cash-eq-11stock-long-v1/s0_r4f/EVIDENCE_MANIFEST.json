@@ -1,0 +1,130 @@
+{
+  "project": "KATS-ORB-CASH-EQ-11STOCK-LONG-V1",
+  "gate": "S0-R4F",
+  "research_date": "2026-10-10",
+  "source_commit": "bf2ea9189795ca96f0f6b26c13b371b6de3cbdd0",
+  "accepted_validator": "98fb16d73eb4c1105c66d15b2da848f489fe96ca",
+  "permitted_data_end": "2025-10-31",
+  "verdict": "S0_R4F_NATIVE_SOURCE_IDENTIFIED",
+  "recommended_source": {
+    "provider": "NSE Data & Analytics Limited",
+    "product": "Capital Market Historical Trade Data",
+    "status": "IDENTIFIED_NOT_ACQUIRED",
+    "native_primitive": "ALL_EXECUTED_TRADE_TICKS",
+    "documented_fields": [
+      "market_session_indicator",
+      "trade_timestamp_jiffies",
+      "symbol",
+      "series",
+      "trade_price",
+      "trade_quantity"
+    ],
+    "published_domestic_fee_inr_per_annum_site": 110000,
+    "taxes_included": false,
+    "exact_period_quote": "UNKNOWN",
+    "exact_requested_date_availability": "REQUIRES_WRITTEN_CONFIRMATION",
+    "purchase_made": false
+  },
+  "sources": [
+    {
+      "id": "NSE_HISTORICAL_DATA_PAGE",
+      "url": "https://www.nseindia.com/static/market-data/eod-historical-data-subscription",
+      "supports": "Official CM historical trade and order/trade product availability and contact route"
+    },
+    {
+      "id": "NSE_HISTORICAL_ORDER_TRADE_SPEC_V1_18",
+      "url": "https://nsearchives.nseindia.com/web/mediaattachment/2026-05/NSE_Hist_Order_Trade_Data_1.18_20260518122214.pdf",
+      "supports": "All-trade-tick frequency, session indicator, timestamp, symbol, series, price and quantity fields"
+    },
+    {
+      "id": "NSE_DOMESTIC_TARIFF_2026_04_01",
+      "url": "https://nsearchives.nseindia.com/web/mediaattachment/2026-04/Download_Pricing_file_-_Domestic_clients_20260424122229.pdf",
+      "supports": "CM Historical Trade Data INR 110000 per annum/site; CM Historical Order and Trade Data INR 1250000 per annum/site; taxes extra"
+    },
+    {
+      "id": "NSE_DATA_POLICY",
+      "url": "https://www.nseindia.com/static/market-data/nse-data-policy",
+      "supports": "Relevant-agreement, usage, retention, redistribution and research-license requirements"
+    },
+    {
+      "id": "NSE_AUTHORIZED_REALTIME_VENDOR_LIST",
+      "url": "https://nsearchives.nseindia.com/web/sites/default/files/inline-files/Authorized_Realtime_Data_Vendors.pdf",
+      "supports": "GFDL, TrueData and Accelpix vendor status; not historical-product admission"
+    },
+    {
+      "id": "GFDL_GETHISTORY",
+      "url": "https://globaldatafeeds.in/global-datafeeds-apis/global-datafeeds-apis/rest-api-documentation/function-gethistory/",
+      "supports": "Minute history and AdjustSplits false option"
+    },
+    {
+      "id": "GFDL_COVERAGE",
+      "url": "https://globaldatafeeds.in/global-datafeeds-apis/global-datafeeds-apis/introduction/type-of-data-available/",
+      "supports": "Documented NSE CM one-minute backfill limited to three calendar months"
+    },
+    {
+      "id": "GFDL_TERMS",
+      "url": "https://globaldatafeeds.in/terms-and-conditions/",
+      "supports": "Subscriber-only use and redistribution restriction"
+    },
+    {
+      "id": "TRUEDATA_VELOCITY",
+      "url": "https://www.truedata.in/products/velocity",
+      "supports": "Historical product explicitly back-adjusted for splits and bonuses"
+    },
+    {
+      "id": "TRUEDATA_MARKETDATA_API",
+      "url": "https://www.truedata.in/products/marketdataapi",
+      "supports": "One-minute API and single-subscriber personal/proprietary analysis terms"
+    },
+    {
+      "id": "ACCELPIX_PRICING",
+      "url": "https://accelpix.com/pricing/",
+      "supports": "INR 1599 monthly entry plan plus GST, 45 days one-minute history, adjusted IEOD"
+    },
+    {
+      "id": "ACCELPIX_API",
+      "url": "https://accelpix.com/products/pix-api/",
+      "supports": "Corporate actions applied across resolutions and separately priced bulk history"
+    },
+    {
+      "id": "ZERODHA_HISTORICAL_API",
+      "url": "https://kite.trade/docs/connect/v3/historical/",
+      "supports": "Several-year minute OHLCV availability"
+    },
+    {
+      "id": "ZERODHA_ADJUSTMENT_POLICY",
+      "url": "https://support.zerodha.com/category/trading-and-markets/charts-and-orders/charts/articles/kite-charts-not-matching-as-per-the-records-in-nse-or-bse",
+      "supports": "Corporate-action-adjusted historical data"
+    },
+    {
+      "id": "ZERODHA_API_PRICING",
+      "url": "https://zerodha.com/products/api/",
+      "supports": "INR 500 monthly API price"
+    }
+  ],
+  "provider_findings": {
+    "NSE_NDAL": "NATIVE_SOURCE_IDENTIFIED_ACCESS_NOT_ACQUIRED",
+    "GFDL": "POTENTIAL_UNADJUSTED_MODE_DOCUMENTED_BUT_REQUIRED_HISTORY_NOT_DOCUMENTED",
+    "TRUEDATA": "DOCUMENTED_BACK_ADJUSTED_REJECT_NATIVE",
+    "ACCELPIX": "DOCUMENTED_ADJUSTED_REJECT_NATIVE",
+    "ZERODHA": "DOCUMENTED_ADJUSTED_REJECT_NATIVE",
+    "UPSTOX": "S0_R4B_ADJUSTED_REJECT_NATIVE",
+    "PUBLIC_ARCHIVE": "S0_R4A_MIXED_TRANSFORMED_REJECT_NATIVE"
+  },
+  "reconstruction": {
+    "price_factor": "THEORETICALLY_INVERTIBLE_BUT_NOT_TICK_EXACT",
+    "minute_volume": "NOT_PROVEN_INVERTIBLE",
+    "cross_bonus_rvol": "INCOMPATIBLE",
+    "recommended_for_scoring": false
+  },
+  "safety": {
+    "frozen_files_changed": false,
+    "strategy_rules_changed": false,
+    "signals_generated": false,
+    "pnl_calculated": false,
+    "holdout_accessed": false,
+    "broker_orders": false,
+    "paid_data_purchased": false,
+    "private_provider_exports_committed": false
+  }
+}
