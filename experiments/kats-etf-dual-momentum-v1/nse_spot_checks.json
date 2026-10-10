@@ -1,0 +1,59 @@
+{
+  "source": "NSE bhavcopy plugin public OHLCV retrieval prior to performance calculation",
+  "rows": [
+    {
+      "symbol": "NIFTYBEES",
+      "date": "2022-03-31",
+      "open": 190.5,
+      "high": 190.5,
+      "low": 188.15,
+      "close": 188.87,
+      "volume": 2204741
+    },
+    {
+      "symbol": "NIFTYBEES",
+      "date": "2024-03-28",
+      "open": 246.1,
+      "high": 248.69,
+      "low": 243.88,
+      "close": 246.96,
+      "volume": 6478348
+    },
+    {
+      "symbol": "NIFTYBEES",
+      "date": "2025-07-31",
+      "open": 279.9,
+      "high": 281.39,
+      "low": 277.33,
+      "close": 279.26,
+      "volume": 6228908
+    },
+    {
+      "symbol": "GOLDBEES",
+      "date": "2022-03-31",
+      "open": 44.48,
+      "high": 44.48,
+      "low": 43.99,
+      "close": 44.12,
+      "volume": 4088541
+    },
+    {
+      "symbol": "GOLDBEES",
+      "date": "2024-03-28",
+      "open": 57.9,
+      "high": 57.9,
+      "low": 56.22,
+      "close": 56.61,
+      "volume": 5581816
+    },
+    {
+      "symbol": "GOLDBEES",
+      "date": "2025-07-31",
+      "open": 82.18,
+      "high": 82.4,
+      "low": 80,
+      "close": 82.2,
+      "volume": 12478359
+    }
+  ]
+}
