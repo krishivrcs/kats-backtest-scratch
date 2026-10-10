@@ -429,7 +429,7 @@ def metrics(trades: list[dict[str, object]]) -> dict[str, object]:
         max_drawdown = max(max_drawdown, peak - equity)
         monthly[str(trade["date"])[:7]] += net
         symbols[str(trade["symbol"])] += net
-    top = sorted(nets, reverse=True)[:3]
+    top = sorted(wins, reverse=True)[:3]
     positive_months = sum(value > 0 for value in monthly.values())
     return {
         "trades": len(trades), "gross_pnl": gross, "costs": costs, "net_pnl": sum(nets),

@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT))
 
 from engine import (IST, Candidate, FiveBar, MinuteBar, aggregate_five, bar_issues,
                     ema5, fill_entry, fill_exit, parse_timestamp, run_portfolio,
-                    session_issues, side_costs, simulate_exit, size_position,
+                    metrics, session_issues, side_costs, simulate_exit, size_position,
                     tick_down, tick_up)
 
 
@@ -124,6 +124,16 @@ class EngineTests(unittest.TestCase):
         trades,rejects=run_portfolio(data,[c1,c2],5)
         self.assertEqual(len(trades),1)
         self.assertEqual(rejects[0]["reason"],"PORTFOLIO_OCCUPIED")
+
+    def test_top_winner_concentration_never_removes_losses(self):
+        rows = [
+            {"net_pnl": 10, "gross_pnl": 11, "costs": 1, "date": "2025-03-01", "symbol": "SBIN"},
+            {"net_pnl": -4, "gross_pnl": -3, "costs": 1, "date": "2025-03-02", "symbol": "TCS"},
+            {"net_pnl": -6, "gross_pnl": -5, "costs": 1, "date": "2025-03-03", "symbol": "INFY"},
+        ]
+        result = metrics(rows)
+        self.assertEqual(result["top_3_winners"], [10])
+        self.assertEqual(result["net_ex_top_3"], -10)
 
 
 if __name__ == "__main__":
