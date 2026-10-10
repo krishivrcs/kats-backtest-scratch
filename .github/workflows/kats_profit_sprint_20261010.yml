@@ -1,0 +1,87 @@
+name: KATS profit sprint 2026-10-10
+
+on:
+  push:
+    branches:
+      - research/kats-profit-sprint-20261010
+    paths:
+      - "experiments/kats-profit-sprint-20261010/**"
+      - ".github/workflows/kats_profit_sprint_20261010.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kats-profit-sprint-20261010
+  cancel-in-progress: false
+
+jobs:
+  frozen-backtest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout exact branch commit
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run deterministic unit tests
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s experiments/kats-profit-sprint-20261010/tests -v \
+            2>&1 | tee /tmp/test-output.txt
+
+      - name: Download and verify frozen public archive
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 5 --retry-all-errors \
+            "https://github.com/voletiramu/nse-fno-1min-data/releases/download/v1.0.0/stocks_1m_csvs.zip" \
+            --output /tmp/stocks_1m_csvs.zip
+          echo "20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2  /tmp/stocks_1m_csvs.zip" | sha256sum --check
+
+      - name: Execute frozen development and untouched validation
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/kats-profit-sprint-results
+          cp /tmp/test-output.txt /tmp/kats-profit-sprint-results/test-output.txt
+          printf '%s\n' "$GITHUB_SHA" > /tmp/kats-profit-sprint-results/source-commit.txt
+          python experiments/kats-profit-sprint-20261010/run.py \
+            /tmp/stocks_1m_csvs.zip \
+            --out /tmp/kats-profit-sprint-results \
+            | tee /tmp/kats-profit-sprint-results/run-summary.json
+
+      - name: Independent safety and reconciliation assertions
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import csv, json
+          from pathlib import Path
+          root = Path('/tmp/kats-profit-sprint-results')
+          result = json.loads((root/'results.json').read_text())
+          manifest = json.loads((root/'data_manifest.json').read_text())
+          assert manifest['archive_sha256'] == '20024713c455cc16b5daae91e06991d57a1acfa6a30c77bb7d5a742ee1789ab2'
+          assert manifest['hard_max_date'] == '2025-10-31'
+          for name, section in [('development','development'), ('validation','validation'), ('adverse_validation','adverse_validation')]:
+              ledger = root/f'{name}_trades.csv'
+              rows = list(csv.DictReader(ledger.open())) if ledger.stat().st_size > 1 else []
+              assert len(rows) == result[section]['trades']
+              net = sum(float(row['net_pnl']) for row in rows)
+              costs = sum(float(row['costs']) for row in rows)
+              assert abs(net - result[section]['net_pnl']) < 1e-7
+              assert abs(costs - result[section]['costs']) < 1e-7
+              assert all(row['date'] <= '2025-10-31' for row in rows)
+              assert all(float(row['planned_risk_pct']) <= 0.0100000001 for row in rows)
+          assert result['verdict'] in {'VALIDATED_CANDIDATE','REJECT'}
+          (root/'reconciliation.txt').write_text('RECONCILIATION=PASS\nHOLDOUT_SCORED=NO\nLIVE_ORDERS=NONE\n')
+          PY
+
+      - name: Upload immutable research evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: kats-profit-sprint-${{ github.run_id }}-${{ github.sha }}
+          path: /tmp/kats-profit-sprint-results/
+          if-no-files-found: error
+          retention-days: 90
